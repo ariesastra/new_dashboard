@@ -8,8 +8,8 @@ export default registerAs('db-config', () => {
   if (process.env.NODE_ENV === 'production') {
     filename = 'prod.yaml';
   }
-  console.log(filename);
-  return yaml.load(readFileSync(join(__dirname, filename), 'utf-8')) as Record<
+
+  return yaml.load(readFileSync(join(__dirname, filename), 'utf8')) as Record<
     string,
     any
   >;

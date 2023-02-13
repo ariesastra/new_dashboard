@@ -3,4 +3,4 @@ database:
   port: 5432
   username: "postgres"
   password: "postgres"
-  database: "dasboard_ads"
+  database: "dashboard_ads"
