@@ -3,4 +3,4 @@ platformDatabase:
   port: 5432
   username: "postgres"
   password: "postgres"
-  database: "dasboard-ads"
+  database: "dasboard_ads"
