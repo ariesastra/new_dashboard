@@ -9,20 +9,12 @@ export class DbConfigService implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-      host: this.configService.get<string>('db-config.platformDatabase.host'),
-      port: this.configService.get<number>('db-config.platformDatabase.port'),
-      username: this.configService.get<string>(
-        'db-config.platformDatabase.username',
-      ),
-      password: this.configService.get<string>(
-        'db-config.platformDatabase.password',
-      ),
-      database: this.configService.get<string>(
-        'db-config.platformDatabase.database',
-      ),
-      schema: this.configService.get<string>(
-        'db-config.platformDatabase.schema',
-      ),
+      host: this.configService.get<string>('db-config.database.host'),
+      port: this.configService.get<number>('db-config.database.port'),
+      username: this.configService.get<string>('db-config.database.username'),
+      password: this.configService.get<string>('db-config.database.password'),
+      database: this.configService.get<string>('db-config.database.database'),
+      schema: this.configService.get<string>('db-config.database.schema'),
       entities: [],
       extra: {
         max: 50,
