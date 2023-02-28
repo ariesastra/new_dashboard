@@ -1,6 +1,25 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { AuthRequest } from './dto/auth.dto';
 
 @Controller('v1/auth')
 export class AuthController {
-  constructor() {}
+  constructor(private readonly authService: AuthService) {}
+
+  @Post('/login')
+  async login(@Body() loginRequest: AuthRequest) {
+    try {
+      return await this.authService.doLogin(loginRequest);
+    } catch (error) {
+      console.error(
+        `[AuthController][login] error when login with credentials ${loginRequest}`,
+      );
+    }
+  }
+
+  @Post('/logout')
+  async logout() {}
+
+  @Post('/refresh')
+  async refreshToken() {}
 }
