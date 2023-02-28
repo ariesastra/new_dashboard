@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { AuthToken } from 'src/services/users/database/entity/AuthToken.entity';
+import { Users } from 'src/services/users/database/entity/User.entity';
 
 @Injectable()
 export class DbConfigService implements TypeOrmOptionsFactory {
@@ -15,7 +17,7 @@ export class DbConfigService implements TypeOrmOptionsFactory {
       password: this.configService.get<string>('db-config.database.password'),
       database: this.configService.get<string>('db-config.database.database'),
       schema: this.configService.get<string>('db-config.database.schema'),
-      entities: [],
+      entities: [Users, AuthToken],
       extra: {
         max: 50,
       },
