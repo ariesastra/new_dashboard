@@ -7,6 +7,7 @@ export class AuthService {
 
   async doLogin(request: AuthRequest): Promise<void> {
     try {
+      console.log(request);
     } catch (error) {}
   }
 

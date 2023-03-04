@@ -9,4 +9,4 @@ import { AuthToken } from './database/entity/AuthToken.entity';
   controllers: [AuthController],
   providers: [AuthService],
 })
-export class UserModule {}
+export class AuthModule {}
