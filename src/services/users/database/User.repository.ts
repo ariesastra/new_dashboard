@@ -1,20 +1,20 @@
-import { Repository, DataSource } from 'typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Users } from './entity/User.entity';
 
-@Injectable()
 export class UserRepository extends Repository<Users> {
-  constructor(private datasource: DataSource) {
-    super(Users, datasource.createEntityManager());
+  constructor(
+    @InjectRepository(Users)
+    private userRepository: Repository<Users>,
+  ) {
+    super(
+      userRepository.target,
+      userRepository.manager,
+      userRepository.queryRunner,
+    );
   }
 
-  async getUserById(id: string): Promise<Users> {
-    const found = await this.findOneBy({ id });
-
-    if (!found) {
-      throw new NotFoundException(`User with ID "${id}" not found`);
-    }
-
-    return found;
+  async findUserByEmail(email: string): Promise<Users> {
+    return await this.findOneBy({ email: email });
   }
 }
