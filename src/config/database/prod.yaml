@@ -4,3 +4,4 @@ database:
   username: "postgres"
   password: "postgres"
   database: "dashboard_ads"
+  schema: "main"
