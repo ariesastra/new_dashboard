@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { UserRegisterRequest } from './dto/user.dto';
+import { Body, Controller, Get, Post, Put } from '@nestjs/common';
+import { GlobalResponse } from 'src/helper/common/common';
+import { UserRequest } from './dto/user.dto';
 import { UserService } from './users.service';
 
 @Controller('v1/users')
@@ -15,11 +16,13 @@ export class UserController {
   }
 
   @Post('/sign-up')
-  async signUp(@Body() signUpReguest: UserRegisterRequest): Promise<any> {
+  async signUp(@Body() signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      return await this.userService.signUp(signUpReguest);
+      return await this.userService.signUp(signUpRequest);
     } catch (error) {
-      console.error();
+      console.error(
+        `[UserController][signUp] error when sign up for ${signUpRequest.email}`,
+      );
     }
   }
 
@@ -28,6 +31,19 @@ export class UserController {
     try {
     } catch (error) {
       console.error();
+    }
+  }
+
+  @Put('/update')
+  async updateUsers(
+    @Body() updateRequest: UserRequest,
+  ): Promise<GlobalResponse> {
+    try {
+      return await this.userService.updateUser(updateRequest);
+    } catch (error) {
+      console.error(
+        `[UserController][updateUsers] error when update user ${updateRequest.email}`,
+      );
     }
   }
 }

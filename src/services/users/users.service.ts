@@ -1,8 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Users } from './database/entity/User.entity';
 import { UserRepository } from './database/User.repository';
-import { UserResponse, UserRegisterRequest } from './dto/user.dto';
+import { UserRequest } from './dto/user.dto';
 import { BcriptSchenario } from 'src/helper/common/bycript';
+import { GlobalResponse } from 'src/helper/common/common';
 
 @Injectable()
 export class UserService {
@@ -11,51 +17,68 @@ export class UserService {
     private readonly hash: BcriptSchenario,
   ) {}
 
-  async signUp(signUpReguest: UserRegisterRequest): Promise<UserResponse> {
+  async signUp(signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
       const userByEmail: Users = await this.userRepository.findUserByEmail(
-        signUpReguest.email,
+        signUpRequest.email,
       );
-      if (!userByEmail) return await this.createNewUser(signUpReguest);
-      else return await this.updateUser(signUpReguest);
+      if (!userByEmail) return await this.createNewUser(signUpRequest);
+      else {
+        const badRequest: BadRequestException = new BadRequestException();
+        return {
+          statusCode: badRequest.getStatus(),
+          error: badRequest.message,
+          message: 'User Already Exists!',
+        };
+      }
     } catch (error) {
       console.error(
-        `[UserService][sugnUpRequest] error when sign up for email: ${signUpReguest.email}`,
+        `[UserService][sugnUpRequest] error when sign up for email: ${signUpRequest.email}`,
       );
       throw new InternalServerErrorException('Error when save new users');
     }
   }
 
-  async updateUser(signUpReguest: UserRegisterRequest): Promise<UserResponse> {
+  // TOBE NOTED: this method is not to change email and password
+  async updateUser(updateRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      // TOBE NOTED: this method is not to change email and password
-      await this.userRepository.update(
-        {
-          email: signUpReguest.email,
-        },
-        {
-          fullName: signUpReguest.fullName,
-          gender: signUpReguest.gender,
-          access: signUpReguest.access,
-          lastUpdatedAt: new Date(),
-        },
+      const isUserExists: Users = await this.userRepository.findUserByEmail(
+        updateRequest.email,
       );
+      if (isUserExists) {
+        await this.userRepository.update(
+          {
+            email: updateRequest.email,
+          },
+          {
+            fullName: updateRequest.fullName,
+            gender: updateRequest.gender,
+            access: updateRequest.access,
+            lastUpdatedAt: new Date(),
+          },
+        );
 
+        return {
+          statusCode: 200,
+          message: `${updateRequest.email} has been updated!`,
+        };
+      }
+
+      const notFound: NotFoundException = new NotFoundException();
       return {
-        statusCode: 200,
-        message: `${signUpReguest.email} has been updated!`,
+        statusCode: notFound.getStatus(),
+        error: notFound.message,
+        message: 'User Not Found!',
       };
     } catch (error) {
       console.error(
-        `[UserService][sugnUpRequest] error when update for email: ${signUpReguest.email}`,
+        `[UserService][sugnUpRequest] error when update for email: ${updateRequest.email}`,
       );
       throw new InternalServerErrorException('Error when update new users');
     }
   }
 
-  async createNewUser(
-    signUpRequest: UserRegisterRequest,
-  ): Promise<UserResponse> {
+  async createNewUser(signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
       const userEntity: Users = new Users();
       userEntity.id = crypto.randomUUID();

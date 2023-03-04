@@ -1,4 +1,4 @@
-export class UserRegisterRequest {
+export class UserRequest {
   email: string;
   password: string;
   fullName: string;
@@ -11,10 +11,4 @@ export enum UserAccessEnum {
   ADMIN = 'ADMIN',
   SALES = 'SALES',
   CLIENT = 'CLIENT',
-}
-
-export class UserResponse {
-  statusCode: number;
-  message: string;
-  error?: string;
 }
