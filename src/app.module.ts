@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DbConfigService } from './config/database/db-config.service';
 import databaseConfig from './config/database/database-config';
 import { AuthModule } from './services/auth/auth.module';
+import { UserModule } from './services/users/users.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { AuthModule } from './services/auth/auth.module';
       inject: [DbConfigService],
     }),
     AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [DbConfigService],

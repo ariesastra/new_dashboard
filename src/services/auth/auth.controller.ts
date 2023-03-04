@@ -18,8 +18,20 @@ export class AuthController {
   }
 
   @Post('/logout')
-  async logout() {}
+  async logout() {
+    try {
+      return await this.authService.doLogout();
+    } catch (error) {
+      console.error(`[AuthController][logout] error when logout`);
+    }
+  }
 
   @Post('/refresh')
-  async refreshToken() {}
+  async refreshToken() {
+    try {
+      return await this.authService.refreshToken();
+    } catch (error) {
+      console.error(`[AuthController][refreshToken] error when refresh token`);
+    }
+  }
 }

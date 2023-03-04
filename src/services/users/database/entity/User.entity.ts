@@ -7,6 +7,8 @@ export class Users extends AuditEntity {
   id: string;
   @Column({ name: 'email' })
   email: string;
+  @Column({ name: 'password' })
+  password: string;
   @Column({ name: 'full_name' })
   fullName: string;
   @Column({ name: 'gender' })
