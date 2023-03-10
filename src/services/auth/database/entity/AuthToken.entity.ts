@@ -7,10 +7,6 @@ export class AuthToken extends AuditEntity {
   id: string;
   @Column({ name: 'user_id' })
   userId: string;
-  @Column({ name: 'source_id' })
-  sourceId: string;
-  @Column({ name: 'source' })
-  source: string;
   @Column({ name: 'refresh_token' })
   refreshToken: string;
 }

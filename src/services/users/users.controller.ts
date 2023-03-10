@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Put } from '@nestjs/common';
-import { GlobalResponse } from 'src/helper/common/common';
+import { GlobalResponse } from 'src/helper/types/common.type';
 import { UserRequest } from './dto/user.dto';
 import { UserService } from './users.service';
 

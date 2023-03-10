@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AuthToken } from './entity/AuthToken.entity';
 
-@Injectable()
 export class AuthTokenRepository extends Repository<AuthToken> {
-  constructor(private datasource: DataSource) {
-    super(AuthToken, datasource.createEntityManager());
+  constructor(
+    @InjectRepository(AuthToken)
+    private authTokenRepository: Repository<AuthToken>,
+  ) {
+    super(
+      authTokenRepository.target,
+      authTokenRepository.manager,
+      authTokenRepository.queryRunner,
+    );
   }
 }

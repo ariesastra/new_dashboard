@@ -1,13 +1,14 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthRequest } from './dto/auth.dto';
+import { Tokens } from './types/token.type';
 
 @Controller('v1/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login')
-  async login(@Body() loginRequest: AuthRequest) {
+  async login(@Body() loginRequest: AuthRequest): Promise<any> {
     try {
       return await this.authService.doLogin(loginRequest);
     } catch (error) {
