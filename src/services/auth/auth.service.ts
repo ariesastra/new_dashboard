@@ -4,6 +4,8 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { BcriptSchenario } from 'src/helper/common/bycript';
 import { GlobalResponse } from 'src/helper/types/common.type';
@@ -11,9 +13,9 @@ import { TokenService } from '../jwt/token.service';
 import { Users } from '../users/database/entity/User.entity';
 import { UserService } from '../users/users.service';
 import { AuthTokenRepository } from './database/AuthToken.repository';
-import { AuthToken } from './database/entity/AuthToken.entity';
+import { AuthTokenEntity } from './database/entity/AuthToken.entity';
 import { AuthRequest } from './dto/auth.dto';
-import { Tokens } from './types/token.type';
+import { JwtPayload, Tokens } from './types/token.type';
 
 @Injectable()
 export class AuthService {
@@ -63,14 +65,63 @@ export class AuthService {
     }
   }
 
-  async doLogout(): Promise<void> {
+  async doLogout(userId: string): Promise<GlobalResponse> {
     try {
-    } catch (error) {}
+      const authTokenByUserId: AuthTokenEntity =
+        await this.authTokenRepository.findTokenByUserId(userId);
+
+      if (authTokenByUserId) {
+        await this.authTokenRepository.delete(authTokenByUserId.id);
+        return {
+          statusCode: 200,
+          message: 'logout successful',
+        };
+      }
+
+      throw new NotFoundException('user not have any token!');
+    } catch (error) {
+      console.log(
+        `[AuthService][doLogout] error when logout for user id ${userId}`,
+      );
+      return error.response;
+    }
   }
 
-  async refreshToken(): Promise<void> {
+  async refreshToken(
+    jwtPayload: JwtPayload,
+    refreshToken: string,
+  ): Promise<GlobalResponse> {
     try {
-    } catch (error) {}
+      const findRefreshToken: AuthTokenEntity =
+        await this.authTokenRepository.findRefreshToken(refreshToken);
+      if (!findRefreshToken) {
+        await this.doLogout(jwtPayload.user.userId);
+        throw new UnauthorizedException('invalid refresh token');
+      }
+
+      const newToken: Tokens = await this.tokenService.getToken(
+        jwtPayload.user.userId,
+        jwtPayload.user.email,
+        jwtPayload.user.access,
+      );
+      if (newToken) {
+        await this.updateRefreshToken(
+          jwtPayload.user.userId,
+          newToken.refreshToken,
+        );
+      }
+
+      return {
+        statusCode: 200,
+        message: 'new token generated!',
+        data: newToken,
+      };
+    } catch (error) {
+      console.error(
+        `[AuthService][refreshToken] error when do refresh token for ${jwtPayload.user.userId}`,
+      );
+      return error.response;
+    }
   }
 
   async saveRefreshToken(
@@ -78,16 +129,47 @@ export class AuthService {
     refreshToken: string,
   ): Promise<boolean> {
     try {
-      const authEntity: AuthToken = new AuthToken();
-      authEntity.id = crypto.randomUUID();
-      authEntity.userId = userId;
-      authEntity.refreshToken = refreshToken;
-      await this.authTokenRepository.save(authEntity);
+      const authTokenByUserId: AuthTokenEntity =
+        await this.authTokenRepository.findTokenByUserId(userId);
+      if (!authTokenByUserId) {
+        const authEntity: AuthTokenEntity = new AuthTokenEntity();
+        authEntity.id = crypto.randomUUID();
+        authEntity.userId = userId;
+        authEntity.refreshToken = refreshToken;
+        await this.authTokenRepository.save(authEntity);
+
+        return true;
+      }
+
+      await this.updateRefreshToken(userId, refreshToken);
+    } catch (error) {
+      console.error(
+        `[AuthService][saveRefreshToken] error when save refresh token for userId: ${userId}`,
+        error,
+      );
+      return false;
+    }
+  }
+
+  async updateRefreshToken(
+    userId: string,
+    newRefreshToken: string,
+  ): Promise<boolean> {
+    try {
+      await this.authTokenRepository.update(
+        {
+          userId: userId,
+        },
+        {
+          refreshToken: newRefreshToken,
+          lastUpdatedAt: new Date(),
+        },
+      );
 
       return true;
     } catch (error) {
       console.error(
-        `[AuthService][saveRefreshToken] error when save refresh token for userId: ${userId}`,
+        `[AuthService][updateRefreshToken] error when update refresh token for userId: ${userId}`,
         error,
       );
       return false;

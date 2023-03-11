@@ -6,16 +6,24 @@ import { UserModule } from '../users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthTokenRepository } from './database/AuthToken.repository';
-import { AuthToken } from './database/entity/AuthToken.entity';
+import { AuthTokenEntity } from './database/entity/AuthToken.entity';
+import { AccessTokenStrategy } from './strategies/access-token.strategy';
+import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AuthToken]),
+    TypeOrmModule.forFeature([AuthTokenEntity]),
     forwardRef(() => UserModule),
     TokenModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthTokenRepository, BcriptSchenario],
+  providers: [
+    AuthService,
+    AuthTokenRepository,
+    BcriptSchenario,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
