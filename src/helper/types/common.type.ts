@@ -3,4 +3,6 @@ export type GlobalResponse = {
   message: string;
   error?: string;
   data?: unknown;
+  options?: unknown;
+  name?: string;
 };

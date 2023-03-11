@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BcriptSchenario } from 'src/helper/common/bycript';
 import { AuthModule } from '../auth/auth.module';
@@ -8,7 +8,11 @@ import { UserRepository } from './database/User.repository';
 import { UserController } from './users.controller';
 import { UserService } from './users.service';
 @Module({
-  imports: [TypeOrmModule.forFeature([Users]), TokenModule, AuthModule],
+  imports: [
+    TypeOrmModule.forFeature([Users]),
+    TokenModule,
+    forwardRef(() => AuthModule),
+  ],
   controllers: [UserController],
   providers: [UserService, BcriptSchenario, UserRepository],
   exports: [UserService, UserRepository],

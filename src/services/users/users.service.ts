@@ -1,7 +1,7 @@
 import {
-  BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Users } from './database/entity/User.entity';
@@ -19,12 +19,13 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly hash: BcriptSchenario,
     private readonly tokenService: TokenService,
+    @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
 
   async signUp(signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      const userByEmail: Users = await this.userRepository.findUserByEmail(
+      const userByEmail: Users = await this.findUserByEmail(
         signUpRequest.email,
       );
       if (!userByEmail) {
@@ -48,19 +49,30 @@ export class UserService {
           },
         };
       } else {
-        const badRequest: BadRequestException = new BadRequestException();
-        return {
-          statusCode: badRequest.getStatus(),
-          error: badRequest.message,
-          message: 'User Already Exists!',
-        };
+        throw new NotFoundException('User Already Exists!');
       }
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when sign up for email: ${signUpRequest.email}`,
         error,
       );
-      throw new InternalServerErrorException('Error when save new users');
+      return error.response;
+    }
+  }
+
+  async findUserByEmail(email: string): Promise<Users> {
+    try {
+      const userByEmail: Users = await this.userRepository.findUserByEmail(
+        email,
+      );
+
+      return userByEmail;
+    } catch (error) {
+      console.error(
+        `[UserService][findUserByEmail] error when find user for ${email}`,
+        email,
+      );
+      return error.response;
     }
   }
 
@@ -89,17 +101,13 @@ export class UserService {
         };
       }
 
-      const notFound: NotFoundException = new NotFoundException();
-      return {
-        statusCode: notFound.getStatus(),
-        error: notFound.message,
-        message: 'User Not Found!',
-      };
+      throw new NotFoundException('User not found!');
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when update for email: ${updateRequest.email}`,
+        error,
       );
-      throw new InternalServerErrorException('Error when update new users');
+      return error.response;
     }
   }
 
@@ -120,8 +128,9 @@ export class UserService {
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when create new user for email: ${signUpRequest.email}`,
+        error,
       );
-      throw new InternalServerErrorException('Error when create new users');
+      return error.response;
     }
   }
 }
