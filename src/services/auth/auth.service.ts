@@ -31,12 +31,15 @@ export class AuthService {
       const userEntity: Users = await this.userService.findUserByEmail(
         request.email,
       );
+      if (!userEntity) {
+        throw new BadRequestException('Invalid email or password!');
+      }
       const validPassword: any = await this.bcrypt.compareSchenario(
         request.password,
         userEntity.password,
       );
-      if (!userEntity || !validPassword) {
-        throw new BadRequestException('Invalid User or Password!');
+      if (!validPassword) {
+        throw new BadRequestException('Invalid email or password!');
       }
 
       // do login logic
@@ -91,6 +94,9 @@ export class AuthService {
     refreshToken: string,
   ): Promise<GlobalResponse> {
     try {
+      console.log(
+        `[AuthService][refreshToken] do refresh token for ${jwtPayload.user.email}`,
+      );
       const findRefreshToken: AuthTokenEntity =
         await this.authTokenRepository.findRefreshToken(refreshToken);
       if (!findRefreshToken) {
