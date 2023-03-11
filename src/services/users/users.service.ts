@@ -1,41 +1,78 @@
 import {
-  BadRequestException,
+  forwardRef,
+  Inject,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { Users } from './database/entity/User.entity';
 import { UserRepository } from './database/User.repository';
 import { UserRequest } from './dto/user.dto';
 import { BcriptSchenario } from 'src/helper/common/bycript';
-import { GlobalResponse } from 'src/helper/common/common';
+import { GlobalResponse } from 'src/helper/types/common.type';
+import { Tokens } from '../auth/types/token.type';
+import { TokenService } from '../jwt/token.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly hash: BcriptSchenario,
+    private readonly tokenService: TokenService,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async signUp(signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      const userByEmail: Users = await this.userRepository.findUserByEmail(
+      const userByEmail: Users = await this.findUserByEmail(
         signUpRequest.email,
       );
-      if (!userByEmail) return await this.createNewUser(signUpRequest);
-      else {
-        const badRequest: BadRequestException = new BadRequestException();
+      if (!userByEmail) {
+        const userEntity: Users = await this.createNewUser(signUpRequest);
+        const accessAndRefreshToken: Tokens = await this.tokenService.getToken(
+          userEntity.id,
+          userEntity.email,
+          userEntity.access,
+        );
+        await this.authService.saveRefreshToken(
+          userEntity.id,
+          accessAndRefreshToken.refreshToken,
+        );
+
         return {
-          statusCode: badRequest.getStatus(),
-          error: badRequest.message,
-          message: 'User Already Exists!',
+          statusCode: 201,
+          message: `User has been created!`,
+          data: {
+            accessToken: accessAndRefreshToken.accessToken,
+            refreshToken: accessAndRefreshToken.refreshToken,
+          },
         };
+      } else {
+        throw new NotFoundException('User Already Exists!');
       }
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when sign up for email: ${signUpRequest.email}`,
+        error,
       );
-      throw new InternalServerErrorException('Error when save new users');
+      return error.response;
+    }
+  }
+
+  async findUserByEmail(email: string): Promise<Users> {
+    try {
+      const userByEmail: Users = await this.userRepository.findUserByEmail(
+        email,
+      );
+
+      return userByEmail;
+    } catch (error) {
+      console.error(
+        `[UserService][findUserByEmail] error when find user for ${email}`,
+        email,
+      );
+      return error.response;
     }
   }
 
@@ -64,21 +101,17 @@ export class UserService {
         };
       }
 
-      const notFound: NotFoundException = new NotFoundException();
-      return {
-        statusCode: notFound.getStatus(),
-        error: notFound.message,
-        message: 'User Not Found!',
-      };
+      throw new NotFoundException('User not found!');
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when update for email: ${updateRequest.email}`,
+        error,
       );
-      throw new InternalServerErrorException('Error when update new users');
+      return error.response;
     }
   }
 
-  async createNewUser(signUpRequest: UserRequest): Promise<GlobalResponse> {
+  async createNewUser(signUpRequest: UserRequest): Promise<Users> {
     try {
       const userEntity: Users = new Users();
       userEntity.id = crypto.randomUUID();
@@ -89,18 +122,15 @@ export class UserService {
       userEntity.fullName = signUpRequest.fullName;
       userEntity.gender = signUpRequest.gender;
       userEntity.access = signUpRequest.access;
-      console.log(userEntity);
       await this.userRepository.save(userEntity);
 
-      return {
-        statusCode: 201,
-        message: 'Success save users',
-      };
+      return userEntity;
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when create new user for email: ${signUpRequest.email}`,
+        error,
       );
-      throw new InternalServerErrorException('Error when create new users');
+      return error.response;
     }
   }
 }

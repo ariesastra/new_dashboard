@@ -1,10 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { Repository, DataSource } from 'typeorm';
-import { AuthToken } from './entity/AuthToken.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { AuthTokenEntity } from './entity/AuthToken.entity';
 
-@Injectable()
-export class AuthTokenRepository extends Repository<AuthToken> {
-  constructor(private datasource: DataSource) {
-    super(AuthToken, datasource.createEntityManager());
+export class AuthTokenRepository extends Repository<AuthTokenEntity> {
+  constructor(
+    @InjectRepository(AuthTokenEntity)
+    private authTokenRepository: Repository<AuthTokenEntity>,
+  ) {
+    super(
+      authTokenRepository.target,
+      authTokenRepository.manager,
+      authTokenRepository.queryRunner,
+    );
+  }
+
+  async findTokenByUserId(userId: string): Promise<AuthTokenEntity> {
+    return this.findOneBy({ userId: userId });
+  }
+
+  async findRefreshToken(refreshToken: string): Promise<AuthTokenEntity> {
+    return this.findOneBy({ refreshToken: refreshToken });
   }
 }

@@ -5,7 +5,7 @@ import { AuditEntity } from 'src/helper/entities/Audit.entity';
 export class Users extends AuditEntity {
   @PrimaryColumn({ name: 'id' })
   id: string;
-  @Column({ name: 'email' })
+  @Column({ name: 'email', unique: true })
   email: string;
   @Column({ name: 'password' })
   password: string;
