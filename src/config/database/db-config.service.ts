@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { AuthTokenEntity } from 'src/services/auth/database/entity/AuthToken.entity';
-import { Users } from 'src/services/users/database/entity/User.entity';
+import { PlatformEntity } from 'src/services/platform/database/entity/platform.entity';
+import { UserEntity } from 'src/services/users/database/entity/User.entity';
 
 @Injectable()
 export class DbConfigService implements TypeOrmOptionsFactory {
@@ -29,7 +30,7 @@ export class DbConfigService implements TypeOrmOptionsFactory {
       password: password,
       database: database,
       schema: 'main',
-      entities: [Users, AuthTokenEntity],
+      entities: [UserEntity, AuthTokenEntity, PlatformEntity],
       extra: {
         max: 50,
       },
