@@ -1,11 +1,10 @@
 import {
-  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Users } from './database/entity/User.entity';
+import { UserEntity } from './database/entity/User.entity';
 import { UserRepository } from './database/User.repository';
 import { UserRequest } from './dto/user.dto';
 import { BcriptSchenario } from 'src/helper/common/bycript';
@@ -26,11 +25,11 @@ export class UserService {
 
   async signUp(signUpRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      const userByEmail: Users = await this.findUserByEmail(
+      const userByEmail: UserEntity = await this.findUserByEmail(
         signUpRequest.email,
       );
       if (!userByEmail) {
-        const userEntity: Users = await this.createNewUser(signUpRequest);
+        const userEntity: UserEntity = await this.createNewUser(signUpRequest);
         const accessAndRefreshToken: Tokens = await this.tokenService.getToken(
           userEntity.id,
           userEntity.email,
@@ -61,9 +60,9 @@ export class UserService {
     }
   }
 
-  async findUserByEmail(email: string): Promise<Users> {
+  async findUserByEmail(email: string): Promise<UserEntity> {
     try {
-      const userByEmail: Users = await this.userRepository.findUserByEmail(
+      const userByEmail: UserEntity = await this.userRepository.findUserByEmail(
         email,
       );
 
@@ -80,9 +79,8 @@ export class UserService {
   // TOBE NOTED: this method is not to change email and password
   async updateUser(updateRequest: UserRequest): Promise<GlobalResponse> {
     try {
-      const isUserExists: Users = await this.userRepository.findUserByEmail(
-        updateRequest.email,
-      );
+      const isUserExists: UserEntity =
+        await this.userRepository.findUserByEmail(updateRequest.email);
       if (isUserExists) {
         await this.userRepository.update(
           {
@@ -112,9 +110,9 @@ export class UserService {
     }
   }
 
-  async createNewUser(signUpRequest: UserRequest): Promise<Users> {
+  async createNewUser(signUpRequest: UserRequest): Promise<UserEntity> {
     try {
-      const userEntity: Users = new Users();
+      const userEntity: UserEntity = new UserEntity();
       userEntity.id = crypto.randomUUID();
       userEntity.email = signUpRequest.email;
       userEntity.password = await this.hash.hashSchenario(

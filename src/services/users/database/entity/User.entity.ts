@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { AuditEntity } from 'src/helper/entities/Audit.entity';
 
 @Entity({ name: 'users' })
-export class Users extends AuditEntity {
+export class UserEntity extends AuditEntity {
   @PrimaryColumn({ name: 'id' })
   id: string;
   @Column({ name: 'email', unique: true })

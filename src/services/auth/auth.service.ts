@@ -9,7 +9,7 @@ import {
 import { BcriptSchenario } from 'src/helper/common/bycript';
 import { GlobalResponse } from 'src/helper/types/common.type';
 import { TokenService } from '../jwt/token.service';
-import { Users } from '../users/database/entity/User.entity';
+import { UserEntity } from '../users/database/entity/User.entity';
 import { UserService } from '../users/users.service';
 import { AuthTokenRepository } from './database/AuthToken.repository';
 import { AuthTokenEntity } from './database/entity/AuthToken.entity';
@@ -28,7 +28,7 @@ export class AuthService {
 
   async doLogin(request: AuthRequest): Promise<GlobalResponse> {
     try {
-      const userEntity: Users = await this.userService.findUserByEmail(
+      const userEntity: UserEntity = await this.userService.findUserByEmail(
         request.email,
       );
       if (!userEntity) {

@@ -7,6 +7,7 @@ import { AuthModule } from './services/auth/auth.module';
 import { UserModule } from './services/users/users.module';
 import configuration from './config/configuration';
 import { TokenModule } from './services/jwt/token.module';
+import { PlatformModule } from './services/platform/platform.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TokenModule } from './services/jwt/token.module';
     AuthModule,
     UserModule,
     TokenModule,
+    PlatformModule,
   ],
   controllers: [],
   providers: [DbConfigService],
