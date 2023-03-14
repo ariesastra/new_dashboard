@@ -7,7 +7,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { BcriptSchenario } from 'src/helper/common/bycript';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponse } from 'src/helper/common/globalResponse';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { TokenService } from '../jwt/token.service';
 import { UserEntity } from '../users/database/entity/User.entity';
 import { UserService } from '../users/users.service';
@@ -18,6 +19,7 @@ import { JwtPayload, Tokens } from './types/token.type';
 
 @Injectable()
 export class AuthService {
+  response: GlobalResponse = new GlobalResponse();
   constructor(
     @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
@@ -26,7 +28,7 @@ export class AuthService {
     private readonly tokenService: TokenService,
   ) {}
 
-  async doLogin(request: AuthRequest): Promise<GlobalResponse> {
+  async doLogin(request: AuthRequest): Promise<GlobalResponseType> {
     try {
       const userEntity: UserEntity = await this.userService.findUserByEmail(
         request.email,
@@ -50,34 +52,31 @@ export class AuthService {
       );
       await this.saveRefreshToken(userEntity.id, generateToken.refreshToken);
 
-      return {
-        statusCode: 200,
-        message: 'Login Successful',
-        data: {
-          accessToken: generateToken.accessToken,
-          refreshToken: generateToken.refreshToken,
-        },
-      };
+      return this.response.successResponse(200, 'login successful', {
+        refreshToken: generateToken.refreshToken,
+        accessToken: generateToken.accessToken,
+      });
     } catch (error) {
       console.error(
         `[AuthService][doLogin] error when login for ${request.email}`,
         error,
       );
-      return error.response;
+      return this.response.errorResponse(
+        400,
+        'invalid email or password!',
+        error.response ? error.response.error : error.detail,
+      );
     }
   }
 
-  async doLogout(userId: string): Promise<GlobalResponse> {
+  async doLogout(userId: string): Promise<GlobalResponseType> {
     try {
       const authTokenByUserId: AuthTokenEntity =
         await this.authTokenRepository.findTokenByUserId(userId);
 
       if (authTokenByUserId) {
         await this.authTokenRepository.delete(authTokenByUserId.id);
-        return {
-          statusCode: 200,
-          message: 'logout successful',
-        };
+        return this.response.successResponse(200, 'logout successful');
       }
 
       throw new NotFoundException('user not have any token!');
@@ -85,14 +84,18 @@ export class AuthService {
       console.log(
         `[AuthService][doLogout] error when logout for user id ${userId}`,
       );
-      return error.response;
+      return this.response.errorResponse(
+        500,
+        'internal server error',
+        error.response ? error.response.error : error.detail,
+      );
     }
   }
 
   async refreshToken(
     jwtPayload: JwtPayload,
     refreshToken: string,
-  ): Promise<GlobalResponse> {
+  ): Promise<GlobalResponseType> {
     try {
       console.log(
         `[AuthService][refreshToken] do refresh token for ${jwtPayload.user.email}`,
@@ -116,16 +119,20 @@ export class AuthService {
         );
       }
 
-      return {
-        statusCode: 200,
-        message: 'new token generated!',
-        data: newToken,
-      };
+      return this.response.successResponse(
+        200,
+        'new token generated!',
+        newToken,
+      );
     } catch (error) {
       console.error(
         `[AuthService][refreshToken] error when do refresh token for ${jwtPayload.user.userId}`,
       );
-      return error.response;
+      return this.response.errorResponse(
+        500,
+        'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 

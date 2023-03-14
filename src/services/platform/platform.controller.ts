@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { PlatformRequest } from './dto/platform.dto';
 import { PlatformService } from './platform.service';
 
@@ -8,7 +8,7 @@ export class PlatformController {
   constructor(private readonly platformService: PlatformService) {}
 
   @Get('/all')
-  async getAllPlatform(): Promise<GlobalResponse> {
+  async getAllPlatform(): Promise<GlobalResponseType> {
     try {
       console.log(`[PlatformController][PlatformService] get all platform`);
       return await this.platformService.getAllPlatform();
@@ -23,7 +23,7 @@ export class PlatformController {
   @Post()
   async createPlatform(
     @Body() platform: PlatformRequest,
-  ): Promise<GlobalResponse> {
+  ): Promise<GlobalResponseType> {
     try {
       console.log(
         `[PlatformController][createPlatform] create platform for ${platform.platformName}`,
@@ -40,7 +40,7 @@ export class PlatformController {
   @Delete()
   async deletePlatfromByName(
     @Query('platform') platformName: string,
-  ): Promise<GlobalResponse> {
+  ): Promise<GlobalResponseType> {
     try {
       return await this.platformService.deletePlatformByName(platformName);
     } catch (error) {

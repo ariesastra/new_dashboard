@@ -1,13 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponse } from 'src/helper/common/globalResponse';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { PlatformEntity } from './database/entity/platform.entity';
 import { PlatformRepository } from './database/platform.repository';
 
 @Injectable()
 export class PlatformService {
+  response = new GlobalResponse();
   constructor(private readonly platformRespository: PlatformRepository) {}
 
-  async createPlatform(platform: string): Promise<GlobalResponse> {
+  async createPlatform(platform: string): Promise<GlobalResponseType> {
     try {
       const newPlatfrom: PlatformEntity = new PlatformEntity();
       newPlatfrom.id = crypto.randomUUID();
@@ -16,20 +18,27 @@ export class PlatformService {
         throw error.detail;
       });
 
-      return {
-        statusCode: 201,
-        message: `platform ${platform} has ben created!`,
-      };
+      return this.response.successResponse(
+        201,
+        `platform ${platform} has ben created!`,
+        newPlatfrom,
+      );
     } catch (error) {
       console.error(
         `[PlatformService][createPlatform] error when create platform for ${platform}`,
         error,
       );
-      return error.response ? error.response : error;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 
-  async deletePlatformByName(platformName: string): Promise<GlobalResponse> {
+  async deletePlatformByName(
+    platformName: string,
+  ): Promise<GlobalResponseType> {
     try {
       const platformByName: PlatformEntity =
         await this.platformRespository.findPlatformByName(
@@ -45,20 +54,24 @@ export class PlatformService {
           throw error.detail;
         });
 
-      return {
-        statusCode: 200,
-        message: `platform ${platformName} delete successful`,
-      };
+      return this.response.successResponse(
+        200,
+        `platform ${platformName} delete successful`,
+      );
     } catch (error) {
       console.error(
         `[PlatformService][deletePlatformByName] error when create platform for ${platformName}`,
         error,
       );
-      return error.response ? error.response : error;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 
-  async getAllPlatform(): Promise<GlobalResponse> {
+  async getAllPlatform(): Promise<GlobalResponseType> {
     try {
       const getAll: PlatformEntity[] = await this.platformRespository.find();
       const collectionName: unknown[] = [];
@@ -71,17 +84,17 @@ export class PlatformService {
         }
       }
 
-      return {
-        statusCode: 200,
-        message: 'Success',
-        data: collectionName,
-      };
+      return this.response.successResponse(200, 'success', collectionName);
     } catch (error) {
       console.error(
         `[PlatformService][getAllPlatform] error when get all platform`,
         error,
       );
-      return error.response ? error.response : error;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 }

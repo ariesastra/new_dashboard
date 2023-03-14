@@ -7,6 +7,7 @@ import {
   UseGuards,
   Request,
   Body,
+  Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CompanyService } from './company.service';
@@ -39,7 +40,22 @@ export class CompanyController {
   }
 
   @Put()
-  async updateCompanyById(): Promise<any> {}
+  async updateCompanyById(
+    @Query('companyId') companyId: string,
+    @Body() request: CreateCompanyRequest,
+  ): Promise<any> {
+    try {
+      console.log(
+        `[CompanyController][createNewCompany] update company for ${companyId}`,
+      );
+      return this.companyService.updateCompanyById(companyId, request);
+    } catch (error) {
+      console.error(
+        `[CompanyController][createNewCompany] error when update company for ${request.companyName}`,
+        error,
+      );
+    }
+  }
 
   @Delete()
   async deleteCompanyById(): Promise<any> {}
