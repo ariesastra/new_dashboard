@@ -29,7 +29,7 @@ export class CompanyService {
       );
     } catch (error) {
       console.error(
-        `[CompanyController][createNewCompany] error when create new company`,
+        `[CompanyService][createNewCompany] error when create new company`,
         error,
       );
       return this.response.errorResponse(
@@ -45,15 +45,13 @@ export class CompanyService {
     companyRequest: CreateCompanyRequest,
   ): Promise<any> {
     try {
-      // get company by id
       const companyById: CompanyEntity = await this.companyRepository.findOneBy(
         { id: id },
       );
-      // if no company, return 404
       if (!companyById) {
         throw new NotFoundException('company not found!');
       }
-      // update company by id
+
       const updateCompanyById: any = await this.companyRepository.update(
         { id: id },
         {
@@ -61,18 +59,61 @@ export class CompanyService {
           companyImg: companyRequest.companyImg,
         },
       );
-      // return 200
-      console.log(updateCompanyById);
+
+      return this.response.successResponse(
+        200,
+        'success update',
+        updateCompanyById,
+      );
     } catch (error) {
       console.error(
-        `[CompanyController][createNewCompany] error when create new company`,
+        `[CompanyService][createNewCompany] error when create new company`,
         error,
       );
       return error.response ? error.response : error.detail;
     }
   }
 
-  async getCompanyByUserId(): Promise<any> {}
+  async getCompanyByUserId(userId: string): Promise<GlobalResponse> {
+    try {
+      // get company from repository
+      // if not found, throw not found
+      // then return
+    } catch (error) {
+      console.error(
+        `[CompanyService][getCompanyByUserId] error when get company by userId for ${userId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
+
+  async getCompanyById(companyId: string): Promise<GlobalResponse> {
+    try {
+      const company: CompanyEntity = await this.companyRepository.findOneBy({
+        id: companyId,
+      });
+      if (!company) {
+        throw new NotFoundException('company id not found!');
+      }
+
+      return this.response.successResponse(200, 'success', company);
+    } catch (error) {
+      console.error(
+        `[CompanyService][getCompanyById] error when get company by id for ${companyId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
 
   async getAllCompany(): Promise<any> {}
 

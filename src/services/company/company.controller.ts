@@ -10,16 +10,37 @@ import {
   Query,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { GlobalResponse } from 'src/helper/common/globalResponse';
+import { JwtPayload } from '../auth/types/token.type';
+import { UserService } from '../users/users.service';
 import { CompanyService } from './company.service';
-import { CreateCompanyRequest } from './dto/company.dto';
+import { AssignCompanyRequest, CreateCompanyRequest } from './dto/company.dto';
 
 @Controller('v1/company')
 export class CompanyController {
-  constructor(private readonly companyService: CompanyService) {}
+  constructor(
+    private readonly companyService: CompanyService,
+    private readonly userService: UserService,
+  ) {}
 
   @UseGuards(AuthGuard('jwt'))
-  @Get()
-  async getCompanyByUserId(@Request() request: Request): Promise<any> {}
+  @Get('user')
+  async getCompanyByUserId(
+    @Request() request: JwtPayload,
+  ): Promise<GlobalResponse> {
+    const userId: string = request.user.userId;
+    try {
+      console.log(
+        `[CompanyController][getCompanyByUserId] get company by user id for ${userId}`,
+      );
+      return this.companyService.getCompanyByUserId(userId);
+    } catch (error) {
+      console.error(
+        `[CompanyController][getCompanyByUserId] error when get company by user id for ${userId}`,
+        error,
+      );
+    }
+  }
 
   @Get('/all')
   async getAllCompany(): Promise<any> {}
@@ -39,9 +60,26 @@ export class CompanyController {
     }
   }
 
+  @Post('/add-to-user')
+  async assignCompanyToUser(
+    @Body() request: AssignCompanyRequest,
+  ): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CompanyController][assignCompanyToUser] assign company id ${request.companyId} to user id ${request.userId}`,
+      );
+      return this.userService.assignCompanyToUser(request);
+    } catch (error) {
+      console.error(
+        `[CompanyController][assignCompanyToUser] error when assign company to user`,
+        error,
+      );
+    }
+  }
+
   @Put()
   async updateCompanyById(
-    @Query('companyId') companyId: string,
+    @Query('company-id') companyId: string,
     @Body() request: CreateCompanyRequest,
   ): Promise<any> {
     try {

@@ -3,6 +3,7 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity } from './database/entity/User.entity';
@@ -14,6 +15,9 @@ import { Tokens } from '../auth/types/token.type';
 import { TokenService } from '../jwt/token.service';
 import { AuthService } from '../auth/auth.service';
 import { GlobalResponse } from 'src/helper/common/globalResponse';
+import { AssignCompanyRequest } from '../company/dto/company.dto';
+import { CompanyEntity } from '../company/database/entity/company.entity';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 export class UserService {
@@ -24,6 +28,8 @@ export class UserService {
     private readonly tokenService: TokenService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
+    @Inject(forwardRef(() => CompanyService))
+    private readonly companyService: CompanyService,
   ) {}
 
   async signUp(signUpRequest: UserRequest): Promise<GlobalResponseType> {
@@ -143,6 +149,50 @@ export class UserService {
       return this.response.errorResponse(
         error.response.statusCode ?? 500,
         error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
+
+  async assignCompanyToUser(
+    request: AssignCompanyRequest,
+  ): Promise<GlobalResponse> {
+    try {
+      const validUser: UserEntity = await this.userRepository.findOneBy({
+        id: request.userId,
+      });
+      const validCompany: GlobalResponse =
+        await this.companyService.getCompanyById(request.companyId);
+      if (!validUser || !validCompany?.data) {
+        throw new NotFoundException('user or company is not valid!');
+      }
+
+      const assignToUser = await this.userRepository.update(
+        {
+          id: request.userId,
+        },
+        {
+          companyId: request.companyId,
+        },
+      );
+
+      if (assignToUser.affected != 1) {
+        throw new InternalServerErrorException('update failed!');
+      }
+
+      return this.response.successResponse(
+        200,
+        `success add company for ${validUser.email} to ${validCompany?.data.companyName}`,
+        assignToUser,
+      );
+    } catch (error) {
+      console.error(
+        `[CompanyController][getCompanyByUserId] error when assign company by userId for ${request.userId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
         error.response ? error.response : error.detail,
       );
     }
