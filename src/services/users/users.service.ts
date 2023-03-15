@@ -1,29 +1,38 @@
 import {
+  BadRequestException,
   forwardRef,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { UserEntity } from './database/entity/User.entity';
 import { UserRepository } from './database/User.repository';
 import { UserRequest } from './dto/user.dto';
 import { BcriptSchenario } from 'src/helper/common/bycript';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { Tokens } from '../auth/types/token.type';
 import { TokenService } from '../jwt/token.service';
 import { AuthService } from '../auth/auth.service';
+import { GlobalResponse } from 'src/helper/common/globalResponse';
+import { AssignCompanyRequest } from '../company/dto/company.dto';
+import { CompanyEntity } from '../company/database/entity/company.entity';
+import { CompanyService } from '../company/company.service';
 
 @Injectable()
 export class UserService {
+  response: GlobalResponse = new GlobalResponse();
   constructor(
     private readonly userRepository: UserRepository,
     private readonly hash: BcriptSchenario,
     private readonly tokenService: TokenService,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
+    @Inject(forwardRef(() => CompanyService))
+    private readonly companyService: CompanyService,
   ) {}
 
-  async signUp(signUpRequest: UserRequest): Promise<GlobalResponse> {
+  async signUp(signUpRequest: UserRequest): Promise<GlobalResponseType> {
     try {
       const userByEmail: UserEntity = await this.findUserByEmail(
         signUpRequest.email,
@@ -40,23 +49,23 @@ export class UserService {
           accessAndRefreshToken.refreshToken,
         );
 
-        return {
-          statusCode: 201,
-          message: `User has been created!`,
-          data: {
-            accessToken: accessAndRefreshToken.accessToken,
-            refreshToken: accessAndRefreshToken.refreshToken,
-          },
-        };
+        return this.response.successResponse(201, `User has been created!`, {
+          accessToken: accessAndRefreshToken.accessToken,
+          refreshToken: accessAndRefreshToken.refreshToken,
+        });
       } else {
-        throw new NotFoundException('User Already Exists!');
+        throw new BadRequestException('User Already Exists!');
       }
     } catch (error) {
       console.error(
         `[UserService][sugnUpRequest] error when sign up for email: ${signUpRequest.email}`,
         error,
       );
-      return error.response;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 
@@ -72,12 +81,16 @@ export class UserService {
         `[UserService][findUserByEmail] error when find user for ${email}`,
         email,
       );
-      return error.response;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 
   // TOBE NOTED: this method is not to change email and password
-  async updateUser(updateRequest: UserRequest): Promise<GlobalResponse> {
+  async updateUser(updateRequest: UserRequest): Promise<GlobalResponseType> {
     try {
       const isUserExists: UserEntity =
         await this.userRepository.findUserByEmail(updateRequest.email);
@@ -106,7 +119,11 @@ export class UserService {
         `[UserService][sugnUpRequest] error when update for email: ${updateRequest.email}`,
         error,
       );
-      return error.response;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 
@@ -129,7 +146,55 @@ export class UserService {
         `[UserService][sugnUpRequest] error when create new user for email: ${signUpRequest.email}`,
         error,
       );
-      return error.response;
+      return this.response.errorResponse(
+        error.response.statusCode ?? 500,
+        error.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
+
+  async assignCompanyToUser(
+    request: AssignCompanyRequest,
+  ): Promise<GlobalResponse> {
+    try {
+      const validUser: UserEntity = await this.userRepository.findOneBy({
+        id: request.userId,
+      });
+      const validCompany: GlobalResponse =
+        await this.companyService.getCompanyById(request.companyId);
+      if (!validUser || !validCompany?.data) {
+        throw new NotFoundException('user or company is not valid!');
+      }
+
+      const assignToUser = await this.userRepository.update(
+        {
+          id: request.userId,
+        },
+        {
+          companyId: request.companyId,
+        },
+      );
+
+      if (assignToUser.affected != 1) {
+        throw new InternalServerErrorException('update failed!');
+      }
+
+      return this.response.successResponse(
+        200,
+        `success add company for ${validUser.email} to ${validCompany?.data.companyName}`,
+        assignToUser,
+      );
+    } catch (error) {
+      console.error(
+        `[CompanyController][getCompanyByUserId] error when assign company by userId for ${request.userId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
     }
   }
 }

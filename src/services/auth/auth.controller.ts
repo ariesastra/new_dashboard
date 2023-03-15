@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { AuthService } from './auth.service';
 import { AuthRequest } from './dto/auth.dto';
 import { JwtPayload } from './types/token.type';
@@ -19,7 +19,7 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginRequest: AuthRequest): Promise<GlobalResponse> {
+  async login(@Body() loginRequest: AuthRequest): Promise<GlobalResponseType> {
     try {
       console.log(`[AuthController][login] do login for ${loginRequest.email}`);
       return await this.authService.doLogin(loginRequest);

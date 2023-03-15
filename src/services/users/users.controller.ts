@@ -7,7 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { GlobalResponse } from 'src/helper/types/common.type';
+import { GlobalResponseType } from 'src/helper/types/common.type';
 import { UserRequest } from './dto/user.dto';
 import { UserService } from './users.service';
 
@@ -26,7 +26,9 @@ export class UserController {
 
   @Post('/sign-up')
   @HttpCode(HttpStatus.CREATED)
-  async signUp(@Body() signUpRequest: UserRequest): Promise<GlobalResponse> {
+  async signUp(
+    @Body() signUpRequest: UserRequest,
+  ): Promise<GlobalResponseType> {
     try {
       return await this.userService.signUp(signUpRequest);
     } catch (error) {
@@ -49,7 +51,7 @@ export class UserController {
   @HttpCode(HttpStatus.OK)
   async updateUsers(
     @Body() updateRequest: UserRequest,
-  ): Promise<GlobalResponse> {
+  ): Promise<GlobalResponseType> {
     try {
       return await this.userService.updateUser(updateRequest);
     } catch (error) {

@@ -15,4 +15,6 @@ export class UserEntity extends AuditEntity {
   gender: string;
   @Column({ name: 'access' })
   access: string;
+  @Column({ name: 'company_id' })
+  companyId: string;
 }

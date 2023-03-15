@@ -1,4 +1,4 @@
-export type GlobalResponse = {
+export type GlobalResponseType = {
   statusCode: number;
   message: string;
   error?: string;
