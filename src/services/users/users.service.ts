@@ -16,7 +16,6 @@ import { TokenService } from '../jwt/token.service';
 import { AuthService } from '../auth/auth.service';
 import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { AssignCompanyRequest } from '../company/dto/company.dto';
-import { CompanyEntity } from '../company/database/entity/company.entity';
 import { CompanyService } from '../company/company.service';
 
 @Injectable()
@@ -187,7 +186,28 @@ export class UserService {
       );
     } catch (error) {
       console.error(
-        `[CompanyController][getCompanyByUserId] error when assign company by userId for ${request.userId}`,
+        `[UserService][getCompanyByUserId] error when assign company by userId for ${request.userId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
+
+  async getCompanyIdByUserId(userId: string): Promise<UserEntity> {
+    try {
+      const userEntity: UserEntity = await this.userRepository.findOneBy({
+        id: userId,
+      });
+      if (!userEntity) throw new NotFoundException('user id not found!');
+
+      return userEntity;
+    } catch (error) {
+      console.error(
+        `[UserService][getCompanyByUserId] error when get company by userId ${userId}`,
         error,
       );
       return this.response.errorResponse(

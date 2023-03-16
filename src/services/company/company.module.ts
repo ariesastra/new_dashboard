@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
 import { TokenModule } from '../jwt/token.module';
 import { UserModule } from '../users/users.module';
+import { UserService } from '../users/users.service';
+import { CompanyAdapter } from './adapter/company.adapter';
 import { CompanyController } from './company.controller';
 import { CompanyService } from './company.service';
 import { CompanyRepository } from './database/company.repository';
@@ -15,7 +17,12 @@ import { CompanyEntity } from './database/entity/company.entity';
     TokenModule,
   ],
   controllers: [CompanyController],
-  providers: [CompanyService, CompanyRepository, AccessTokenStrategy],
+  providers: [
+    CompanyService,
+    CompanyRepository,
+    AccessTokenStrategy,
+    CompanyAdapter,
+  ],
   exports: [CompanyService],
 })
 export class CompanyModule {}

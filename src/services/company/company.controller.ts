@@ -43,7 +43,17 @@ export class CompanyController {
   }
 
   @Get('/all')
-  async getAllCompany(): Promise<any> {}
+  async getAllCompany(): Promise<GlobalResponse> {
+    try {
+      console.log(`[CompanyController][getAllCompany] start get all company`);
+      return await this.companyService.getAllCompany();
+    } catch (error) {
+      console.error(
+        `[CompanyController][getAllCompany] error when get all company`,
+        error,
+      );
+    }
+  }
 
   @Post('/create')
   async createNewCompany(@Body() request: CreateCompanyRequest): Promise<any> {
