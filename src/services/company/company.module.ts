@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
 import { UserModule } from '../users/users.module';
 import { CompanyController } from './company.controller';
 import { CompanyService } from './company.service';
@@ -12,7 +13,7 @@ import { CompanyEntity } from './database/entity/company.entity';
     forwardRef(() => UserModule),
   ],
   controllers: [CompanyController],
-  providers: [CompanyService, CompanyRepository],
+  providers: [CompanyService, CompanyRepository, AccessTokenStrategy],
   exports: [CompanyService],
 })
 export class CompanyModule {}

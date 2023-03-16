@@ -117,5 +117,19 @@ export class CompanyService {
 
   async getAllCompany(): Promise<any> {}
 
-  async deleteCompanyById(): Promise<any> {}
+  async deleteCompanyById(companyId: string): Promise<any> {
+    try {
+      console.log(companyId);
+    } catch (error) {
+      console.error(
+        `[CompanyService][getCompanyById] error when get company by id for ${companyId}`,
+        error,
+      );
+      return this.response.errorResponse(
+        error.response?.statusCode ?? 500,
+        error?.message ?? 'internal server error',
+        error.response ? error.response : error.detail,
+      );
+    }
+  }
 }

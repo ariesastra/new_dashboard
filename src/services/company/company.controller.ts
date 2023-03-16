@@ -95,6 +95,21 @@ export class CompanyController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete()
-  async deleteCompanyById(): Promise<any> {}
+  async deleteCompanyById(
+    @Query('company-id') companyId: string,
+  ): Promise<any> {
+    try {
+      console.log(
+        `[CompanyController][createNewCompany] update company for ${companyId}`,
+      );
+      return await this.companyService.deleteCompanyById(companyId);
+    } catch (error) {
+      console.error(
+        `[CompanyController][createNewCompany] error when delete company id ${companyId}`,
+        error,
+      );
+    }
+  }
 }
