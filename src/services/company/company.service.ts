@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CompanyRepository } from './database/company.repository';
 import { CompanyEntity } from './database/entity/company.entity';
 import { CreateCompanyRequest } from './dto/company.dto';
@@ -119,7 +119,28 @@ export class CompanyService {
 
   async deleteCompanyById(companyId: string): Promise<any> {
     try {
-      console.log(companyId);
+      const companyById: CompanyEntity = await this.companyRepository.findOneBy(
+        {
+          id: companyId,
+        },
+      );
+      if (!companyById) {
+        throw new NotFoundException('company not found!');
+      }
+
+      const deleteById: any = await this.companyRepository.delete({
+        id: companyId,
+      });
+      if (deleteById.affected === 0) {
+        throw new InternalServerErrorException(
+          `'something wrong when deletion process for company id ${companyId}`,
+        );
+      }
+
+      return this.response.successResponse(
+        200,
+        `company ${companyById.companyName} deleted successfully`,
+      );
     } catch (error) {
       console.error(
         `[CompanyService][getCompanyById] error when get company by id for ${companyId}`,

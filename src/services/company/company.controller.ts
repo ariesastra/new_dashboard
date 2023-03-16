@@ -102,12 +102,12 @@ export class CompanyController {
   ): Promise<any> {
     try {
       console.log(
-        `[CompanyController][createNewCompany] update company for ${companyId}`,
+        `[CompanyController][deleteCompanyById] delete company id ${companyId}`,
       );
       return await this.companyService.deleteCompanyById(companyId);
     } catch (error) {
       console.error(
-        `[CompanyController][createNewCompany] error when delete company id ${companyId}`,
+        `[CompanyController][deleteCompanyById] error when delete company id ${companyId}`,
         error,
       );
     }
