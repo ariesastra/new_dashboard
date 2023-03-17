@@ -7,6 +7,24 @@ import { CampaignRequest } from './dto/campaign.dto';
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
+  @Get('/:companyId')
+  async getCampaignByCompanyId(
+    @Param('companyId') companyId: string,
+  ): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CampaignController][getCampaignByCompanyId] start get campaign by company id for ${companyId}`,
+      );
+
+      return await this.campaignService.getCampaignByCompanyId(companyId);
+    } catch (error) {
+      console.error(
+        `[CampaignController][getCampaignByCompanyId] error when get campaign by company id for ${companyId}`,
+        error,
+      );
+    }
+  }
+
   @Get('/all')
   async getAllCampaign(): Promise<GlobalResponse> {
     try {
@@ -23,31 +41,15 @@ export class CampaignController {
     }
   }
 
-  @Get('/:company-id')
-  async getCampaignByCompanyId(
-    @Param('company-id') companyId: string,
-  ): Promise<GlobalResponse> {
-    try {
-      console.log(
-        `[CampaignController][getCampaignByCompanyId] start get campaign by company id for ${companyId}`,
-      );
-
-      return await this.campaignService.getCampaignByCompanyId(companyId);
-    } catch (error) {
-      console.error(
-        `[CampaignController][getCampaignByCompanyId] error when get campaign by company id for ${companyId}`,
-        error,
-      );
-    }
-  }
-
   @Post('/create')
   async createNewCampaign(
     @Body() campaignRequest: CampaignRequest,
   ): Promise<GlobalResponse> {
     try {
       console.log(
-        `[CampaignController][createNewCampaign] start create new campaign for ${campaignRequest}`,
+        `[CampaignController][createNewCampaign] start create new campaign for ${JSON.stringify(
+          campaignRequest,
+        )}`,
       );
 
       return await this.campaignService.createNewCampaign(campaignRequest);
@@ -59,9 +61,9 @@ export class CampaignController {
     }
   }
 
-  @Put('/:campaign-id/update')
+  @Put('/:campaignId/update')
   async updateCampaignById(
-    @Param('campaign-id') campaignId: string,
+    @Param('campaignId') campaignId: string,
     @Body() campaignRequest: CampaignRequest,
   ): Promise<GlobalResponse> {
     try {

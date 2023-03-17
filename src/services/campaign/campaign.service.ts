@@ -8,7 +8,6 @@ import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { CampaignRepository } from './database/campaign.repository';
 import { CampaignEntity } from './database/entity/campaign.entity';
 import { CampaignRequest } from './dto/campaign.dto';
-import crypto from 'crypto';
 
 @Injectable()
 export class CampaignService {
@@ -62,7 +61,7 @@ export class CampaignService {
     campaignRequest: CampaignRequest,
   ): Promise<GlobalResponse> {
     try {
-      if (!campaignRequest.companyId || campaignRequest.campaignName) {
+      if (!campaignRequest.companyId || !campaignRequest.campaignName) {
         throw new BadRequestException('fill all requested form');
       }
       const campaignEntity: CampaignEntity = new CampaignEntity();
@@ -99,6 +98,7 @@ export class CampaignService {
         {
           campaignName: campaignRequest.campaignName,
           companyId: campaignRequest.companyId,
+          lastUpdatedAt: new Date(),
         },
       );
       if (!updateById.affected)
