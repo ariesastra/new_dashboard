@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccessTokenStrategy } from '../auth/strategies/access-token.strategy';
 import { TokenModule } from '../jwt/token.module';
 import { UserModule } from '../users/users.module';
-import { UserService } from '../users/users.service';
 import { CompanyAdapter } from './adapter/company.adapter';
 import { CompanyController } from './company.controller';
 import { CompanyService } from './company.service';
