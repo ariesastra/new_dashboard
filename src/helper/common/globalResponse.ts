@@ -31,4 +31,12 @@ export class GlobalResponse {
 
     return response;
   }
+
+  public error(error): any {
+    return this.errorResponse(
+      error.response?.statusCode ?? 500,
+      error?.message ?? 'internal server error',
+      error.response ? error.response : error.detail,
+    );
+  }
 }
