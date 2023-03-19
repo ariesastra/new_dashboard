@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
+import { AdsContainerEntity } from 'src/services/ads_container/database/entity/adsContainer.entity';
 import { AuthTokenEntity } from 'src/services/auth/database/entity/AuthToken.entity';
 import { CampaignEntity } from 'src/services/campaign/database/entity/campaign.entity';
 import { CompanyEntity } from 'src/services/company/database/entity/company.entity';
@@ -38,6 +39,7 @@ export class DbConfigService implements TypeOrmOptionsFactory {
         PlatformEntity,
         CompanyEntity,
         CampaignEntity,
+        AdsContainerEntity,
       ],
       extra: {
         max: 50,
