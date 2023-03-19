@@ -10,6 +10,7 @@ import { TokenModule } from './services/jwt/token.module';
 import { PlatformModule } from './services/platform/platform.module';
 import { CompanyModule } from './services/company/company.module';
 import { CampaignModule } from './services/campaign/campaign.module';
+import { AdsContainerModule } from './services/ads_container/adsContainer.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CampaignModule } from './services/campaign/campaign.module';
     PlatformModule,
     CompanyModule,
     CampaignModule,
+    AdsContainerModule,
   ],
   controllers: [],
   providers: [DbConfigService],
