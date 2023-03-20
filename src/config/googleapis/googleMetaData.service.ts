@@ -7,7 +7,7 @@ export class GoogleMetadataService {
   async sheetsConnection() {
     try {
       const googleAuth = new google.auth.GoogleAuth({
-        keyFile: 'GoogleCredentials.json',
+        keyFile: './src/config/googleapis/GoogleCredentials.json',
         scopes: 'https://www.googleapis.com/auth/spreadsheets',
       });
       const client = await googleAuth.getClient();
