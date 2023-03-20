@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { GlobalResponseType } from 'src/helper/types/common.type';
 import { PlatformRequest } from './dto/platform.dto';
 import { PlatformService } from './platform.service';
@@ -37,15 +37,15 @@ export class PlatformController {
     }
   }
 
-  @Delete()
-  async deletePlatfromByName(
-    @Query('platform') platformName: string,
+  @Delete('/:platformId')
+  async deletePlatfromById(
+    @Param('platformId') platformId: string,
   ): Promise<GlobalResponseType> {
     try {
-      return await this.platformService.deletePlatformByName(platformName);
+      return await this.platformService.deletePlatformById(platformId);
     } catch (error) {
       console.error(
-        `[PlatformController][deletePlatfromByName] error when create platform for ${platformName}`,
+        `[PlatformController][deletePlatfromByName] error when delte platform id for ${platformId}`,
         error,
       );
     }

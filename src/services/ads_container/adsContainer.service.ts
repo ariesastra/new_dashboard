@@ -21,7 +21,13 @@ export class AdsContainerService {
     try {
       const adsContainer: AdsContainerEntity[] =
         await this.adsContainerRepository.find();
-      return this.response.successResponse(200, 'success', adsContainer);
+      const containerResponse: AdsContainerEntity[] = [];
+      for (const container of adsContainer) {
+        containerResponse.push(
+          this.adsContainerAdapter.entityToResponse(container),
+        );
+      }
+      return this.response.successResponse(200, 'success', containerResponse);
     } catch (error) {
       console.error(
         `[AdsContainerService][getAllAdsContainer] error when get all campaign`,
@@ -61,8 +67,7 @@ export class AdsContainerService {
       newAdsContainer.campaignId = request.campaignId;
       newAdsContainer.platformId = request.platformId;
       newAdsContainer.adsName = request.adsName;
-      newAdsContainer.sheetId =
-        request.sheetId || request.sheetId == '' ? null : request.sheetId;
+      newAdsContainer.sheetId = request.sheetId ?? null;
       await this.adsContainerRepository.save(newAdsContainer);
 
       return this.response.successResponse(

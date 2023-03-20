@@ -28,46 +28,33 @@ export class PlatformService {
         `[PlatformService][createPlatform] error when create platform for ${platform}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response.statusCode ?? 500,
-        error.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
-  async deletePlatformByName(
-    platformName: string,
-  ): Promise<GlobalResponseType> {
+  async deletePlatformById(platformId: string): Promise<GlobalResponseType> {
     try {
-      const platformByName: PlatformEntity =
-        await this.platformRespository.findPlatformByName(
-          platformName.toUpperCase(),
-        );
-      if (!platformByName) {
-        throw new NotFoundException(`platform ${platformName} not found!`);
+      const platformById: PlatformEntity =
+        await this.platformRespository.findOneBy({ id: platformId });
+      if (!platformById) {
+        throw new NotFoundException(`platform ${platformId} not found!`);
       }
 
-      await this.platformRespository
-        .delete(platformByName.id)
-        .catch((error) => {
-          throw error.detail;
-        });
+      await this.platformRespository.delete(platformById.id).catch((error) => {
+        throw error.detail;
+      });
 
       return this.response.successResponse(
         200,
-        `platform ${platformName} delete successful`,
+        `platform ${platformById.platformName} delete successful`,
+        platformById,
       );
     } catch (error) {
       console.error(
-        `[PlatformService][deletePlatformByName] error when create platform for ${platformName}`,
+        `[PlatformService][deletePlatformById] error when delete platform id for ${platformId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response.statusCode ?? 500,
-        error.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -90,11 +77,7 @@ export class PlatformService {
         `[PlatformService][getAllPlatform] error when get all platform`,
         error,
       );
-      return this.response.errorResponse(
-        error.response.statusCode ?? 500,
-        error.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 }
