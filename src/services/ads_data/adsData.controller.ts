@@ -1,8 +1,14 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
+import { GoogleMetadataService } from 'src/config/googleapis/googleMetaData.service';
 
 @Controller('v1/ads-data')
 export class AdsDataController {
-  constructor() {}
+  constructor(private readonly googleMetadata: GoogleMetadataService) {}
+
+  @Get('/google-connection')
+  async sheetConnection(): Promise<any> {
+    return this.googleMetadata.sheetsConnection();
+  }
 
   @Post('/create')
   async createNewAdsData(): Promise<any> {
