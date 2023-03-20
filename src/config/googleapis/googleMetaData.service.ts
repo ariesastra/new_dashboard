@@ -11,7 +11,9 @@ export class GoogleMetadataService {
         scopes: 'https://www.googleapis.com/auth/spreadsheets',
       });
       const client = await googleAuth.getClient();
-      console.log(client);
+      const googleSheets = google.sheets({ version: 'v4', auth: client });
+
+      return googleSheets;
     } catch (error) {
       console.error(
         `[GoogleMetadataService][sheetsConnection] error when connect to google apis`,
