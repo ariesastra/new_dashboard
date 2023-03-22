@@ -61,6 +61,24 @@ export class CampaignController {
     }
   }
 
+  @Post('/:id/activate')
+  async activateCampaignById(
+    @Param('id') campaignId: string,
+  ): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CampaignController][activateCampaignById] start activate campaing by id`,
+      );
+
+      return this.campaignService.activateCampaignById(campaignId);
+    } catch (error) {
+      console.error(
+        `[CampaignController][activateCampaignById] error when activate campaign by id for ${campaignId}`,
+        error,
+      );
+    }
+  }
+
   @Put('/:campaignId/update')
   async updateCampaignById(
     @Param('campaignId') campaignId: string,

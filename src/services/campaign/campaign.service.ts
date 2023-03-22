@@ -7,7 +7,7 @@ import {
 import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { CampaignRepository } from './database/campaign.repository';
 import { CampaignEntity } from './database/entity/campaign.entity';
-import { CampaignRequest } from './dto/campaign.dto';
+import { CampaignRequest, CampaignStatus } from './dto/campaign.dto';
 
 @Injectable()
 export class CampaignService {
@@ -54,6 +54,35 @@ export class CampaignService {
         error?.message ?? 'internal server error',
         error.response ? error.response : error.detail,
       );
+    }
+  }
+
+  async activateCampaignById(id: string): Promise<GlobalResponse> {
+    try {
+      const campaign: CampaignEntity = await this.campaignRepository.findOneBy({
+        id: id,
+      });
+      if (!campaign) throw new NotFoundException(`invalid campaign id`);
+
+      const updateStatus = await this.campaignRepository.update(
+        { id: id },
+        { status: CampaignStatus.ACTIVE, lastUpdatedAt: new Date() },
+      );
+
+      if (updateStatus.affected === 1) {
+        return this.response.successResponse(200, 'success', updateStatus);
+      }
+
+      throw new InternalServerErrorException(
+        `failed update status campaign for id ${id}`,
+      );
+    } catch (error) {
+      console.error(
+        `[CampaignService][activateCompanyById] error when activate campaign by id for ${id}`,
+        error,
+      );
+
+      throw this.response.error(error);
     }
   }
 
