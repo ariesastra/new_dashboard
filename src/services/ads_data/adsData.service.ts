@@ -4,6 +4,7 @@ import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { AdsContainerEntity } from '../ads_container/database/entity/adsContainer.entity';
 import { RegularDataAdapter } from './adapter/regularData.adapter';
 import { AdsDataRepository } from './database/adsData.repository';
+import { AdsDataEntity } from './database/entity/adsData.entity';
 import { sheetsRange } from './dto/adsData.dto';
 
 @Injectable()
@@ -24,7 +25,7 @@ export class AdsDataService {
         );
 
         if (range === 'regular') {
-          await this.regularRangeAssignment(sheetData);
+          await this.regularRangeAssignment(sheetData, containerEntity.id);
         }
       }
     } catch (error) {
@@ -36,13 +37,26 @@ export class AdsDataService {
     }
   }
 
-  async regularRangeAssignment(regularSheetData: any[]): Promise<any> {
+  async regularRangeAssignment(
+    regularSheetData: any[],
+    containerId: string,
+  ): Promise<any> {
     try {
       const [first, ...restOfRegularData] = regularSheetData;
       for (const regularData of restOfRegularData) {
-        const regularDataAdapter =
-          this.regularDataAdapter.sheetToInterface(regularData);
-        console.log(regularDataAdapter);
+        const [globalAdsData, regularAdsData, youtubeAdsData] =
+          this.regularDataAdapter.youtubeInterface(regularData);
+
+        const regularAdsDataEntity: AdsDataEntity = new AdsDataEntity();
+        regularAdsDataEntity.id = crypto.randomUUID();
+        regularAdsDataEntity.date = globalAdsData.date;
+        regularAdsDataEntity.containerId = containerId;
+        regularAdsDataEntity.adsData = {
+          regularAdsData,
+          youtubeAdsData,
+        };
+        console.log(regularAdsDataEntity);
+        await this.adsDataRepository.save(regularAdsDataEntity);
       }
     } catch (error) {
       console.error(

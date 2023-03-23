@@ -1,4 +1,4 @@
-export interface YoutubeAdsData {
+export class YoutubeAdsData {
   ctr: number;
   videoViews: number;
   videoViewsRate: number;

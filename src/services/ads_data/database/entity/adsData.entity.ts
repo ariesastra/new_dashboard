@@ -10,5 +10,5 @@ export class AdsDataEntity extends AuditEntity {
   @Column({ name: 'container_id' })
   containerId: string;
   @Column({ name: 'ads_data', type: 'jsonb' })
-  adsData: JSON;
+  adsData: unknown;
 }

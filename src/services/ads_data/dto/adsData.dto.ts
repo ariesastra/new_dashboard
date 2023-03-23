@@ -18,10 +18,15 @@ export enum DeviceData {
 
 export class GlobalAdsData {
   date: Date;
+  cotainerId: string;
+  adsData: unknown;
+}
+
+export class ReguralAdsData {
   impression: number;
   clicks: number;
   gender: GenderData;
   device: DeviceData;
   age_range: string;
-  regiion: string;
+  region: string;
 }
