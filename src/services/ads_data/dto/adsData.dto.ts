@@ -29,4 +29,6 @@ export class ReguralAdsData {
   device: DeviceData;
   age_range: string;
   region: string;
+  reach: number;
+  linkClicks: number;
 }

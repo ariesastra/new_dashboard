@@ -2,9 +2,17 @@ import { GlobalAdsData, ReguralAdsData } from '../dto/adsData.dto';
 import { YoutubeAdsData } from '../dto/youtubeAds.dto';
 
 export class RegularDataAdapter {
-  public youtubeInterface(
-    sheetData: any[],
-  ): [GlobalAdsData, ReguralAdsData, YoutubeAdsData] {
+  public regularDataInterface(globalAdsData, regularAdsData, platformAdsData) {
+    console.log(globalAdsData, regularAdsData, platformAdsData);
+  }
+
+  public youtubeInterface(sheetData: any[]) {
+    /**
+     * NEXT DEVELOPMENT
+      jadi nanti next nya, ga usah di pisah pisah per dto gini, langsung aja
+      di adapter assign data yang dibutuhin untuk tiap interface, dan langsung 
+      return hasilnya.
+     */
     const globalAdsData: GlobalAdsData = new GlobalAdsData();
     globalAdsData.date = sheetData[0];
 
@@ -26,6 +34,6 @@ export class RegularDataAdapter {
     youtubeAdsData.watch100view = parseInt(sheetData[9]);
     youtubeAdsData.watch100rate = parseFloat(sheetData[13]);
 
-    return [globalAdsData, regularAdsData, youtubeAdsData];
+    this.regularDataInterface(globalAdsData, regularAdsData, youtubeAdsData);
   }
 }

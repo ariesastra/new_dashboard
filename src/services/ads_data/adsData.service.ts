@@ -44,19 +44,15 @@ export class AdsDataService {
     try {
       const [first, ...restOfRegularData] = regularSheetData;
       for (const regularData of restOfRegularData) {
-        const [globalAdsData, regularAdsData, youtubeAdsData] =
-          this.regularDataAdapter.youtubeInterface(regularData);
+        this.regularDataAdapter.youtubeInterface(regularData);
 
-        const regularAdsDataEntity: AdsDataEntity = new AdsDataEntity();
-        regularAdsDataEntity.id = crypto.randomUUID();
-        regularAdsDataEntity.date = globalAdsData.date;
-        regularAdsDataEntity.containerId = containerId;
-        regularAdsDataEntity.adsData = {
-          regularAdsData,
-          youtubeAdsData,
-        };
-        console.log(regularAdsDataEntity);
-        await this.adsDataRepository.save(regularAdsDataEntity);
+        // const regularAdsDataEntity: AdsDataEntity = new AdsDataEntity();
+        // regularAdsDataEntity.id = crypto.randomUUID();
+        // regularAdsDataEntity.date = globalAdsData.date;
+        // regularAdsDataEntity.containerId = containerId;
+        // regularAdsDataEntity.adsData = {};
+
+        // await this.adsDataRepository.save(regularAdsDataEntity);
       }
     } catch (error) {
       console.error(
