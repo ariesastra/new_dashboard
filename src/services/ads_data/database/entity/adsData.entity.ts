@@ -3,12 +3,12 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'ads_data' })
 export class AdsDataEntity extends AuditEntity {
-  @PrimaryColumn({ name: '' })
-  id: string;
-  @Column({ name: 'date' })
+  @PrimaryColumn({ name: 'date' })
   date: Date;
-  @Column({ name: 'container_id' })
+  @PrimaryColumn({ name: 'container_id' })
   containerId: string;
+  @PrimaryColumn({ name: 'ads_range' })
+  adsRange: string;
   @Column({ name: 'ads_data', type: 'jsonb' })
   adsData: unknown;
 }

@@ -1,39 +1,23 @@
-import { GlobalAdsData, ReguralAdsData } from '../dto/adsData.dto';
-import { YoutubeAdsData } from '../dto/youtubeAds.dto';
+import { AdsData } from '../dto/adsData.dto';
 
 export class RegularDataAdapter {
-  public regularDataInterface(globalAdsData, regularAdsData, platformAdsData) {
-    console.log(globalAdsData, regularAdsData, platformAdsData);
-  }
+  public youtube(sheetData: any[]) {
+    const adsData: AdsData = new AdsData();
+    adsData.impression = parseInt(sheetData[1]);
+    adsData.clicks = parseInt(sheetData[2]);
+    adsData.ctr = parseFloat(sheetData[3]);
+    adsData.videoViewsRate = parseFloat(sheetData[5]);
+    adsData.videoViews = parseInt(sheetData[4]);
+    adsData.videoImpression = parseInt(sheetData[14]);
+    adsData.watch25View = parseInt(sheetData[6]);
+    adsData.watch25Rate = parseFloat(sheetData[10]);
+    adsData.watch50View = parseInt(sheetData[7]);
+    adsData.watch50Rate = parseFloat(sheetData[11]);
+    adsData.watch75View = parseInt(sheetData[8]);
+    adsData.watch75Rate = parseFloat(sheetData[12]);
+    adsData.watch100View = parseInt(sheetData[9]);
+    adsData.watch100Rate = parseFloat(sheetData[13]);
 
-  public youtubeInterface(sheetData: any[]) {
-    /**
-     * NEXT DEVELOPMENT
-      jadi nanti next nya, ga usah di pisah pisah per dto gini, langsung aja
-      di adapter assign data yang dibutuhin untuk tiap interface, dan langsung 
-      return hasilnya.
-     */
-    const globalAdsData: GlobalAdsData = new GlobalAdsData();
-    globalAdsData.date = sheetData[0];
-
-    const regularAdsData: ReguralAdsData = new ReguralAdsData();
-    regularAdsData.impression = parseInt(sheetData[1]);
-    regularAdsData.clicks = parseInt(sheetData[2]);
-
-    const youtubeAdsData: YoutubeAdsData = new YoutubeAdsData();
-    youtubeAdsData.ctr = parseFloat(sheetData[3]);
-    youtubeAdsData.videoViewsRate = parseInt(sheetData[5]);
-    youtubeAdsData.videoViews = parseInt(sheetData[4]);
-    youtubeAdsData.videoImpression = parseInt(sheetData[14]);
-    youtubeAdsData.watch25view = parseInt(sheetData[6]);
-    youtubeAdsData.watch25rate = parseFloat(sheetData[10]);
-    youtubeAdsData.watch50view = parseInt(sheetData[7]);
-    youtubeAdsData.watch50rate = parseFloat(sheetData[11]);
-    youtubeAdsData.watch75view = parseInt(sheetData[8]);
-    youtubeAdsData.watch75rate = parseFloat(sheetData[12]);
-    youtubeAdsData.watch100view = parseInt(sheetData[9]);
-    youtubeAdsData.watch100rate = parseFloat(sheetData[13]);
-
-    this.regularDataInterface(globalAdsData, regularAdsData, youtubeAdsData);
+    return adsData;
   }
 }

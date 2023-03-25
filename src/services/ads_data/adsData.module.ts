@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GoogleMetadataService } from 'src/config/googleapis/googleMetaData.service';
 import { AdsContainerModule } from '../ads_container/adsContainer.module';
 import { RegularDataAdapter } from './adapter/regularData.adapter';
+import { YoutubeAdapter } from './adapter/youtubeData.adapter';
 import { AdsDataController } from './adsData.controller';
 import { AdsDataService } from './adsData.service';
 import { AdsDataRepository } from './database/adsData.repository';
@@ -16,6 +17,7 @@ import { AdsDataEntity } from './database/entity/adsData.entity';
     AdsDataRepository,
     GoogleMetadataService,
     RegularDataAdapter,
+    YoutubeAdapter,
   ],
   exports: [AdsDataService],
 })
