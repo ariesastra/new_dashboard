@@ -7,7 +7,7 @@ import { RegularDataAdapter } from './adapter/regularData.adapter';
 import { YoutubeAdapter } from './adapter/youtubeData.adapter';
 import { AdsDataRepository } from './database/adsData.repository';
 import { AdsDataEntity } from './database/entity/adsData.entity';
-import { AdsData, SHEET_RANGE } from './dto/adsData.dto';
+import { AdsData, ObjectResponse, SHEET_RANGE } from './dto/adsData.dto';
 
 @Injectable()
 export class AdsDataService {
@@ -23,6 +23,8 @@ export class AdsDataService {
   async createNewAdsData(containerEntity: AdsContainerEntity): Promise<any> {
     try {
       const sheetRange = Object.keys(SHEET_RANGE);
+      const objResponse: ObjectResponse = new ObjectResponse();
+      objResponse.adsName = containerEntity.adsName;
       for (const range of sheetRange) {
         const sheetData = await this.googleService.sheetsConnection(
           range.toLowerCase(),
@@ -37,37 +39,59 @@ export class AdsDataService {
             sheetData,
             containerEntity,
             adsDataEntity,
-          );
+          ).catch(() => {
+            objResponse.regular = 'FAIL';
+          });
+
+          objResponse.regular = 'SUCCESS';
         }
         if (range === SHEET_RANGE.GENDER) {
           await this.genderRangeAssignment(
             sheetData,
             containerEntity,
             adsDataEntity,
-          );
+          ).catch(() => {
+            objResponse.gender = 'FAIL';
+          });
+
+          objResponse.gender = 'SUCCESS';
         }
         if (range === SHEET_RANGE.DEVICE) {
           await this.deviceDataAssignment(
             sheetData,
             containerEntity,
             adsDataEntity,
-          );
+          ).catch(() => {
+            objResponse.device = 'FAIL';
+          });
+
+          objResponse.device = 'SUCCESS';
         }
         if (range === SHEET_RANGE.AGE) {
           await this.ageDataAssignment(
             sheetData,
             containerEntity,
             adsDataEntity,
-          );
+          ).catch(() => {
+            objResponse.age = 'FAIL';
+          });
+
+          objResponse.age = 'SUCCESS';
         }
         if (range === SHEET_RANGE.LOCATION) {
           await this.locationDataAssignment(
             sheetData,
             containerEntity,
             adsDataEntity,
-          );
+          ).catch(() => {
+            objResponse.location = 'FAIL';
+          });
+
+          objResponse.location = 'SUCCESS';
         }
       }
+
+      return this.response.successResponse(200, 'SUCCESS', objResponse);
     } catch (error) {
       console.error(
         `[AdsDataService][createNewAdsData] error when create new ads data`,
@@ -237,6 +261,18 @@ export class AdsDataService {
       console.log(
         `[AdsDataService][ageDateAssignment] success save data ${SHEET_RANGE.LOCATION} for ${adsContainer.adsName}`,
       );
+    }
+  }
+
+  async getDataByContainerId(adsContainer: AdsContainerEntity): Promise<void> {
+    try {
+      console.log(adsContainer);
+    } catch (error) {
+      console.error(
+        `[AdsDataService][ageDateAssignment] error when get ads data by container id for ${adsContainer.id}`,
+        error,
+      );
+      throw error;
     }
   }
 }

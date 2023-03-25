@@ -1,7 +1,9 @@
-import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { GoogleMetadataService } from 'src/config/googleapis/googleMetaData.service';
 import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { AdsContainerService } from '../ads_container/adsContainer.service';
+import { AdsContainerEntity } from '../ads_container/database/entity/adsContainer.entity';
 import { AdsDataService } from './adsData.service';
 import { AdsDataRequest } from './dto/adsData.dto';
 
@@ -13,14 +15,31 @@ export class AdsDataController {
     private readonly adsDataService: AdsDataService,
   ) {}
 
-  @Get('/sheets-data')
-  async sheetConnection(): Promise<any> {
-    return this.googleMetadata.sheetsConnection(
-      'regular',
-      '1uCfIwIbjRp_D9baqVq0p3v6tUm9_yIBoAk9znXhVxAA',
-    );
+  @Get('/:containerId')
+  async adsDataByContainerId(
+    @Param('containerId') containerId: string,
+  ): Promise<any> {
+    try {
+      console.log(
+        `[AdsDataController][adsDataByContainerId] start get ads data by container id for ${containerId}`,
+      );
+      const adsContainer: GlobalResponse =
+        await this.adsContainerService.getAdsContainerById(containerId);
+      if (adsContainer.statusCode !== 200) {
+        throw new NotFoundException(`invalid container id for ${containerId}`);
+      }
+
+      return this.adsDataService.getDataByContainerId(adsContainer.data);
+    } catch (error) {
+      console.error(
+        `[AdsDataController][adsDataByContainerId] error when get ads data by container id for ${containerId}`,
+        error,
+      );
+      throw error;
+    }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('/create')
   async createNewAdsData(@Body() adsDataRequest: AdsDataRequest): Promise<any> {
     try {

@@ -51,3 +51,12 @@ export class AdsData {
   watch100View: number;
   watch100Rate: number;
 }
+
+export class ObjectResponse {
+  adsName: string;
+  regular: string;
+  gender: string;
+  device: string;
+  age: string;
+  location: string;
+}
