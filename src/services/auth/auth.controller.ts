@@ -54,6 +54,7 @@ export class AuthController {
     try {
       const jwtPayload: JwtPayload = request;
       const refreshToken: string = request.user.refreshToken;
+
       return await this.authService.refreshToken(jwtPayload, refreshToken);
     } catch (error) {
       console.error(`[AuthController][refreshToken] error when refresh token`);

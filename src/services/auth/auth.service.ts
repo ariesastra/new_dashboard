@@ -100,10 +100,11 @@ export class AuthService {
       console.log(
         `[AuthService][refreshToken] do refresh token for ${jwtPayload.user.email}`,
       );
+
       const findRefreshToken: AuthTokenEntity =
         await this.authTokenRepository.findRefreshToken(refreshToken);
       if (!findRefreshToken) {
-        await this.doLogout(jwtPayload.user.userId);
+        // await this.doLogout(jwtPayload.user.userId);
         throw new UnauthorizedException('invalid refresh token');
       }
 
