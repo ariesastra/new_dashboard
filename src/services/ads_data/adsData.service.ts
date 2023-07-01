@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleMetadataService } from 'src/config/googleapis/googleMetaData.service';
 import { GlobalResponse } from 'src/helper/common/globalResponse';
-import { AdsContainerService } from '../ads_container/adsContainer.service';
 import { AdsContainerEntity } from '../ads_container/database/entity/adsContainer.entity';
-import { RegularDataAdapter } from './adapter/regularData.adapter';
 import { YoutubeAdapter } from './adapter/youtubeData.adapter';
 import { AdsDataRepository } from './database/adsData.repository';
 import { AdsDataEntity } from './database/entity/adsData.entity';
-import { AdsData, ObjectResponse, SHEET_RANGE } from './dto/adsData.dto';
-
+import { AdsData, GlobalAdsData, ObjectResponse, SHEET_RANGE } from './dto/adsData.dto';
+import { PlatformService } from '../platform/platform.service';
+import { Platform, PlatformName } from '../platform/dto/platform.dto';
+import { YoutubeAdsService } from '../youtube/youtube.service';
 @Injectable()
 export class AdsDataService {
   response = new GlobalResponse();
   constructor(
     private readonly adsDataRepository: AdsDataRepository,
     private readonly googleService: GoogleMetadataService,
-    private readonly regularDataAdapter: RegularDataAdapter,
     private readonly youtubeAdapter: YoutubeAdapter,
-    private readonly adsContainerService: AdsContainerService,
+    private readonly platformService: PlatformService,
+    private readonly youtubeService: YoutubeAdsService,
   ) {}
 
-  async createNewAdsData(containerEntity: AdsContainerEntity): Promise<any> {
+  async fetchAdsData(containerEntity: AdsContainerEntity): Promise<void> {
     try {
       const sheetRange = Object.keys(SHEET_RANGE);
       const objResponse: ObjectResponse = new ObjectResponse();
@@ -31,64 +31,70 @@ export class AdsDataService {
           containerEntity.sheetId,
         );
 
-        const adsDataEntity: AdsDataEntity = new AdsDataEntity();
-        adsDataEntity.containerId = containerEntity.id;
+        const adsData: GlobalAdsData = new GlobalAdsData();
+        adsData.containerId = containerEntity.id;
 
-        if (range === SHEET_RANGE.REGULAR) {
-          await this.regularRangeAssignment(
-            sheetData,
-            containerEntity,
-            adsDataEntity,
-          ).catch(() => {
-            objResponse.regular = 'FAIL';
-          });
-
-          objResponse.regular = 'SUCCESS';
+        if (range === SHEET_RANGE.GENERAL) {
+          await this.generalRangeAssignment(sheetData, containerEntity, adsData)
+            .then(() => {
+              objResponse.regular = 'SUCCESS';
+            })
+            .catch(() => {
+              objResponse.regular = 'FAIL';
+            });
         }
-        if (range === SHEET_RANGE.GENDER) {
-          await this.genderRangeAssignment(
-            sheetData,
-            containerEntity,
-            adsDataEntity,
-          ).catch(() => {
-            objResponse.gender = 'FAIL';
-          });
-
-          objResponse.gender = 'SUCCESS';
-        }
-        if (range === SHEET_RANGE.DEVICE) {
-          await this.deviceDataAssignment(
-            sheetData,
-            containerEntity,
-            adsDataEntity,
-          ).catch(() => {
-            objResponse.device = 'FAIL';
-          });
-
-          objResponse.device = 'SUCCESS';
-        }
-        if (range === SHEET_RANGE.AGE) {
-          await this.ageDataAssignment(
-            sheetData,
-            containerEntity,
-            adsDataEntity,
-          ).catch(() => {
-            objResponse.age = 'FAIL';
-          });
-
-          objResponse.age = 'SUCCESS';
-        }
-        if (range === SHEET_RANGE.LOCATION) {
-          await this.locationDataAssignment(
-            sheetData,
-            containerEntity,
-            adsDataEntity,
-          ).catch(() => {
-            objResponse.location = 'FAIL';
-          });
-
-          objResponse.location = 'SUCCESS';
-        }
+        // if (range === SHEET_RANGE.GENDER) {
+        //   await this.genderRangeAssignment(
+        //     sheetData,
+        //     containerEntity,
+        //     adsDataEntity,
+        //   )
+        //     .then(() => {
+        //       objResponse.gender = 'SUCCESS';
+        //     })
+        //     .catch(() => {
+        //       objResponse.gender = 'FAIL';
+        //     });
+        // }
+        // if (range === SHEET_RANGE.DEVICE) {
+        //   await this.deviceDataAssignment(
+        //     sheetData,
+        //     containerEntity,
+        //     adsDataEntity,
+        //   )
+        //     .then(() => {
+        //       objResponse.device = 'SUCCESS';
+        //     })
+        //     .catch(() => {
+        //       objResponse.device = 'FAIL';
+        //     });
+        // }
+        // if (range === SHEET_RANGE.AGE) {
+        //   await this.ageDataAssignment(
+        //     sheetData,
+        //     containerEntity,
+        //     adsDataEntity,
+        //   )
+        //     .then(() => {
+        //       objResponse.age = 'SUCCESS';
+        //     })
+        //     .catch(() => {
+        //       objResponse.age = 'FAIL';
+        //     });
+        // }
+        // if (range === SHEET_RANGE.LOCATION) {
+        //   await this.locationDataAssignment(
+        //     sheetData,
+        //     containerEntity,
+        //     adsDataEntity,
+        //   )
+        //     .then(() => {
+        //       objResponse.location = 'SUCCESS';
+        //     })
+        //     .catch(() => {
+        //       objResponse.location = 'FAIL';
+        //     });
+        // }
       }
 
       return this.response.successResponse(200, 'SUCCESS', objResponse);
@@ -101,33 +107,33 @@ export class AdsDataService {
     }
   }
 
-  async regularRangeAssignment(
-    regularSheetData: any[],
+  async generalRangeAssignment(
+    generalSheetData: Array<string[]>,
     adsContainer: AdsContainerEntity,
-    adsDataEntity: AdsDataEntity,
-  ): Promise<any> {
+    adsData: GlobalAdsData,
+  ): Promise<void> {
     try {
-      const [first, ...restOfRegularData] = regularSheetData;
-      for (const regularData of restOfRegularData) {
-        const adsData: AdsData = this.regularDataAdapter.youtube(regularData);
-        adsDataEntity.date = regularData[0];
-        adsDataEntity.adsRange = SHEET_RANGE.REGULAR;
-        adsDataEntity.adsData = adsData;
+      console.log('GENERAL SHEETS DATA: ', generalSheetData[0]);
+      console.log('ADS CONTAINER: ', adsContainer);
+      console.log('ADS ENTITY: ', adsData);
+      // exclude first array object
+      const [, ...restOfGeneralData] = generalSheetData;
 
-        await this.adsDataRepository
-          .upsert(adsDataEntity, ['date', 'containerId', 'adsRange'])
-          .catch((error) => console.log(error));
+      // get a platform
+      const platform: Platform = await this.platformService.getPlatformById(
+        adsContainer.platformId,
+      );
+      // conditon base on platform
+      if (platform.platformName === PlatformName.YOUTUBE) {
+        await this.
       }
+
     } catch (error) {
       console.error(
-        `[AdsDataService][createNewAdsData] error when create new ${SHEET_RANGE.REGULAR} ads data for ${adsContainer.adsName}`,
+        `[AdsDataService][createNewAdsData] error when create new ${SHEET_RANGE.GENERAL} ads data for ${adsContainer.adsName}`,
         error,
       );
       throw error;
-    } finally {
-      console.log(
-        `[AdsDataService][regularRangeAssignment] success save data ${SHEET_RANGE.REGULAR} for ${adsContainer.adsName}`,
-      );
     }
   }
 
@@ -137,7 +143,7 @@ export class AdsDataService {
     adsDataEntity: AdsDataEntity,
   ): Promise<void> {
     try {
-      const [first, ...restOfGenderData] = genderSheetData;
+      const [, ...restOfGenderData] = genderSheetData;
       for (const genderData of restOfGenderData) {
         const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
           genderData,
@@ -170,7 +176,7 @@ export class AdsDataService {
     adsDataEntity: AdsDataEntity,
   ): Promise<void> {
     try {
-      const [first, ...restOfDeviceData] = deviceSheetData;
+      const [, ...restOfDeviceData] = deviceSheetData;
       for (const deviceData of restOfDeviceData) {
         const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
           deviceData,
@@ -203,7 +209,7 @@ export class AdsDataService {
     adsDataEntity: AdsDataEntity,
   ): Promise<void> {
     try {
-      const [first, ...restOfAgeData] = ageSheetData;
+      const [, ...restOfAgeData] = ageSheetData;
       for (const ageData of restOfAgeData) {
         const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
           ageData,
@@ -236,7 +242,7 @@ export class AdsDataService {
     adsDataEntity: AdsDataEntity,
   ): Promise<void> {
     try {
-      const [first, ...restOfLocationData] = locationSheetData;
+      const [, ...restOfLocationData] = locationSheetData;
       for (const locationData of restOfLocationData) {
         const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
           locationData,

@@ -7,6 +7,22 @@ import { CampaignRequest } from './dto/campaign.dto';
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
+  @Get('/all')
+  async getAllCampaign(): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CampaignController][getAllCampaign] start get all campaign`,
+      );
+
+      return await this.campaignService.getAllCampaign();
+    } catch (error) {
+      console.error(
+        `[CampaignController][getAllCampaign] error when get all campaign`,
+        error,
+      );
+    }
+  }
+
   @Get('/:companyId')
   async getCampaignByCompanyId(
     @Param('companyId') companyId: string,
@@ -20,22 +36,6 @@ export class CampaignController {
     } catch (error) {
       console.error(
         `[CampaignController][getCampaignByCompanyId] error when get campaign by company id for ${companyId}`,
-        error,
-      );
-    }
-  }
-
-  @Get('/all')
-  async getAllCampaign(): Promise<GlobalResponse> {
-    try {
-      console.log(
-        `[CampaignController][getAllCampaign] start get all campaign`,
-      );
-
-      return await this.campaignService.getAllCampaign();
-    } catch (error) {
-      console.error(
-        `[CampaignController][getAllCampaign] error when get all campaign`,
         error,
       );
     }

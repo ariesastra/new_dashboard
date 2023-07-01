@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { GlobalResponseType } from 'src/helper/types/common.type';
-import { PlatformRequest } from './dto/platform.dto';
+import { Platform } from './dto/platform.dto';
 import { PlatformService } from './platform.service';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -37,7 +37,7 @@ export class PlatformController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async createPlatform(
-    @Body() platform: PlatformRequest,
+    @Body() platform: Platform,
   ): Promise<GlobalResponseType> {
     try {
       console.log(

@@ -1,5 +1,5 @@
 export enum SHEET_RANGE {
-  REGULAR = 'REGULAR',
+  GENERAL = 'GENERAL',
   GENDER = 'GENDER',
   DEVICE = 'DEVICE',
   AGE = 'AGE',
@@ -24,7 +24,7 @@ export enum DeviceData {
 
 export class GlobalAdsData {
   date: Date;
-  cotainerId: string;
+  containerId: string;
   adsRange: string;
   adsData: unknown;
 }

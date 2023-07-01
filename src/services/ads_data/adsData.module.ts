@@ -10,12 +10,14 @@ import { AdsDataController } from './adsData.controller';
 import { AdsDataService } from './adsData.service';
 import { AdsDataRepository } from './database/adsData.repository';
 import { AdsDataEntity } from './database/entity/adsData.entity';
+import { PlatformModule } from '../platform/platform.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AdsDataEntity]),
     AdsContainerModule,
     TokenModule,
+    PlatformModule,
   ],
   controllers: [AdsDataController],
   providers: [

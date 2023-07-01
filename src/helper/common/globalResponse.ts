@@ -2,6 +2,7 @@ import { GlobalResponseType } from '../types/common.type';
 
 export class GlobalResponse {
   [x: string]: any;
+
   public successResponse(
     statusCode: number,
     message: string,

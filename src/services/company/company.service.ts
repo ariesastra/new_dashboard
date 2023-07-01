@@ -46,11 +46,7 @@ export class CompanyService {
         `[CompanyService][createNewCompany] error when create new company`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -84,7 +80,7 @@ export class CompanyService {
         `[CompanyService][createNewCompany] error when create new company`,
         error,
       );
-      return error.response ? error.response : error.detail;
+      return this.response.error(error);
     }
   }
 
@@ -108,11 +104,7 @@ export class CompanyService {
         `[CompanyService][getCompanyByUserId] error when get company by userId for ${userId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -125,17 +117,17 @@ export class CompanyService {
         throw new NotFoundException('company id not found!');
       }
 
-      return this.response.successResponse(200, 'success', company);
+      return this.response.successResponse(
+        200,
+        'success',
+        this.companyAdapter.EntityToResult(company),
+      );
     } catch (error) {
       console.error(
         `[CompanyService][getCompanyById] error when get company by id for ${companyId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -154,11 +146,7 @@ export class CompanyService {
         `[CompanyService][getCompanyById] error when get all company`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -191,11 +179,7 @@ export class CompanyService {
         `[CompanyService][getCompanyById] error when get company by id for ${companyId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 }

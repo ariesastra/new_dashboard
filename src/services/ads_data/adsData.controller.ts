@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   NotFoundException,
   Param,
   Post,
@@ -47,8 +49,9 @@ export class AdsDataController {
   }
 
   @UseGuards(AuthGuard('jwt'))
-  @Post('/create')
-  async createNewAdsData(@Body() adsDataRequest: AdsDataRequest): Promise<any> {
+  @Post('/fetch')
+  @HttpCode(HttpStatus.OK)
+  async fetchNewAdsData(@Body() adsDataRequest: AdsDataRequest): Promise<any> {
     try {
       console.log(
         `[AdsDataController][createNewAdsData] start creating new ads data`,
@@ -63,7 +66,7 @@ export class AdsDataController {
           `invalid container id for ${adsDataRequest.containerId}`,
         );
 
-      return this.adsDataService.createNewAdsData(adsContainer.data);
+      return this.adsDataService.fetchAdsData(adsContainer.data);
     } catch (error) {
       console.error(
         `[AdsDataController][createNewAdsData] error when create new ads data`,
