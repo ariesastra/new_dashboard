@@ -3,7 +3,7 @@ export enum SHEET_RANGE {
   GENDER = 'GENDER',
   DEVICE = 'DEVICE',
   AGE = 'AGE',
-  LOCATION = 'LOCATION',
+  REGION = 'REGION',
 }
 
 export class AdsDataRequest {
@@ -35,7 +35,7 @@ export class AdsData {
   gender: GenderData;
   device: DeviceData;
   ageRange: string;
-  location: string;
+  region: string;
   reach: number;
   ctr: number;
   linkClicks: number;

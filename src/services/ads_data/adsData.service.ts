@@ -5,7 +5,12 @@ import { AdsContainerEntity } from '../ads_container/database/entity/adsContaine
 import { YoutubeAdapter } from './adapter/youtubeData.adapter';
 import { AdsDataRepository } from './database/adsData.repository';
 import { AdsDataEntity } from './database/entity/adsData.entity';
-import { AdsData, GlobalAdsData, ObjectResponse, SHEET_RANGE } from './dto/adsData.dto';
+import {
+  AdsData,
+  GlobalAdsData,
+  ObjectResponse,
+  SHEET_RANGE,
+} from './dto/adsData.dto';
 import { PlatformService } from '../platform/platform.service';
 import { Platform, PlatformName } from '../platform/dto/platform.dto';
 import { YoutubeAdsService } from '../youtube/youtube.service';
@@ -43,19 +48,15 @@ export class AdsDataService {
               objResponse.regular = 'FAIL';
             });
         }
-        // if (range === SHEET_RANGE.GENDER) {
-        //   await this.genderRangeAssignment(
-        //     sheetData,
-        //     containerEntity,
-        //     adsDataEntity,
-        //   )
-        //     .then(() => {
-        //       objResponse.gender = 'SUCCESS';
-        //     })
-        //     .catch(() => {
-        //       objResponse.gender = 'FAIL';
-        //     });
-        // }
+        if (range === SHEET_RANGE.GENDER) {
+          await this.genderRangeAssignment(sheetData, containerEntity, adsData)
+            .then(() => {
+              objResponse.gender = 'SUCCESS';
+            })
+            .catch(() => {
+              objResponse.gender = 'FAIL';
+            });
+        }
         // if (range === SHEET_RANGE.DEVICE) {
         //   await this.deviceDataAssignment(
         //     sheetData,
@@ -113,9 +114,6 @@ export class AdsDataService {
     adsData: GlobalAdsData,
   ): Promise<void> {
     try {
-      console.log('GENERAL SHEETS DATA: ', generalSheetData[0]);
-      console.log('ADS CONTAINER: ', adsContainer);
-      console.log('ADS ENTITY: ', adsData);
       // exclude first array object
       const [, ...restOfGeneralData] = generalSheetData;
 
@@ -125,9 +123,12 @@ export class AdsDataService {
       );
       // conditon base on platform
       if (platform.platformName === PlatformName.YOUTUBE) {
-        await this.
+        await this.youtubeService.youtubeGeneralAssignemnt(
+          restOfGeneralData,
+          adsContainer,
+          adsData,
+        );
       }
-
     } catch (error) {
       console.error(
         `[AdsDataService][createNewAdsData] error when create new ${SHEET_RANGE.GENERAL} ads data for ${adsContainer.adsName}`,
@@ -138,25 +139,12 @@ export class AdsDataService {
   }
 
   async genderRangeAssignment(
-    genderSheetData: any[],
+    genderSheetData: Array<string[]>,
     adsContainer: AdsContainerEntity,
-    adsDataEntity: AdsDataEntity,
+    adsData: GlobalAdsData,
   ): Promise<void> {
     try {
       const [, ...restOfGenderData] = genderSheetData;
-      for (const genderData of restOfGenderData) {
-        const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
-          genderData,
-          SHEET_RANGE.GENDER,
-        );
-        adsDataEntity.date = genderData[0];
-        adsDataEntity.adsRange = SHEET_RANGE.GENDER + '.' + genderData[1];
-        adsDataEntity.adsData = adsData;
-
-        await this.adsDataRepository
-          .upsert(adsDataEntity, ['date', 'containerId', 'adsRange'])
-          .catch((error) => console.error(error));
-      }
     } catch (error) {
       console.error(
         `[AdsDataService][genderRangeAssignment] error when create new ${SHEET_RANGE.GENDER} ads data for ${adsContainer.adsName}`,

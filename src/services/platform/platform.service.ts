@@ -18,7 +18,7 @@ export class PlatformService {
     try {
       const newPlatfrom: PlatformEntity = new PlatformEntity();
       newPlatfrom.id = crypto.randomUUID();
-      newPlatfrom.platformName = platform;
+      newPlatfrom.platformName = platform.toUpperCase();
       await this.platformRespository.save(newPlatfrom).catch((error) => {
         throw error.detail;
       });

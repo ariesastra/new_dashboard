@@ -7,14 +7,14 @@ export class YoutubeAdapter {
     if (range === SHEET_RANGE.DEVICE) adsData.device = sheetData[1];
     if (range === SHEET_RANGE.GENDER) adsData.gender = sheetData[1];
     if (range === SHEET_RANGE.AGE) adsData.ageRange = sheetData[1];
-    if (range === SHEET_RANGE.LOCATION) adsData.location = sheetData[1];
+    if (range === SHEET_RANGE.REGION) adsData.region = sheetData[1];
 
     adsData.impression = parseInt(sheetData[2]);
     adsData.clicks = parseInt(sheetData[3]);
     adsData.ctr = parseInt(sheetData[4]);
     adsData.videoViews = parseInt(sheetData[5]);
 
-    if (range !== SHEET_RANGE.LOCATION) {
+    if (range !== SHEET_RANGE.REGION) {
       adsData.videoViewsRate = sheetData[6] ? parseFloat(sheetData[6]) : 0;
       adsData.watch25View = sheetData[7] ? parseInt(sheetData[7]) : 0;
       adsData.watch75View = sheetData[8] ? parseInt(sheetData[8]) : 0;

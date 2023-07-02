@@ -11,6 +11,7 @@ import { AdsDataService } from './adsData.service';
 import { AdsDataRepository } from './database/adsData.repository';
 import { AdsDataEntity } from './database/entity/adsData.entity';
 import { PlatformModule } from '../platform/platform.module';
+import { YoutubeAdsModule } from '../youtube/youtube.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PlatformModule } from '../platform/platform.module';
     AdsContainerModule,
     TokenModule,
     PlatformModule,
+    YoutubeAdsModule,
   ],
   controllers: [AdsDataController],
   providers: [
