@@ -7,29 +7,34 @@ import {
 import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { CampaignRepository } from './database/campaign.repository';
 import { CampaignEntity } from './database/entity/campaign.entity';
-import { CampaignRequest } from './dto/campaign.dto';
+import { CampaignRequest, CampaignStatus } from './dto/campaign.dto';
+import { CampaignAdapter } from './adapter/campaign.adapter';
 
 @Injectable()
 export class CampaignService {
   response = new GlobalResponse();
-  constructor(private readonly campaignRepository: CampaignRepository) {}
+  constructor(
+    private readonly campaignRepository: CampaignRepository,
+    private readonly campaignAdapter: CampaignAdapter,
+  ) {}
 
   async getAllCampaign(): Promise<GlobalResponse> {
     try {
       const allCampaign: CampaignEntity[] =
         await this.campaignRepository.find();
+      const response: object[] = [];
+      for (const campaign of allCampaign) {
+        const adapterCampaign = this.campaignAdapter.EntityToResult(campaign);
+        response.push(adapterCampaign);
+      }
 
-      return this.response.successResponse(200, 'success', allCampaign);
+      return this.response.successResponse(200, 'success', response);
     } catch (error) {
       console.error(
         `[CampaignService][getAllCampaign] error when get all campaign`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -43,17 +48,46 @@ export class CampaignService {
         throw new NotFoundException('company id not found');
       }
 
-      return this.response.successResponse(200, 'success', campaignEntity);
+      return this.response.successResponse(
+        200,
+        'success',
+        this.campaignAdapter.EntityToResult(campaignEntity),
+      );
     } catch (error) {
       console.error(
         `[CampaignService][getCampaignByCompanyId] error when get campaign by company id for ${companyId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
+      return this.response.error(error);
+    }
+  }
+
+  async activateCampaignById(id: string): Promise<GlobalResponse> {
+    try {
+      const campaign: CampaignEntity = await this.campaignRepository.findOneBy({
+        id: id,
+      });
+      if (!campaign) throw new NotFoundException(`invalid campaign id`);
+
+      const updateStatus = await this.campaignRepository.update(
+        { id: id },
+        { status: CampaignStatus.ACTIVE, lastUpdatedAt: new Date() },
       );
+
+      if (updateStatus.affected === 1) {
+        return this.response.successResponse(200, 'success', updateStatus);
+      }
+
+      throw new InternalServerErrorException(
+        `failed update status campaign for id ${id}`,
+      );
+    } catch (error) {
+      console.error(
+        `[CampaignService][activateCompanyById] error when activate campaign by id for ${id}`,
+        error,
+      );
+
+      throw this.response.error(error);
     }
   }
 
@@ -76,11 +110,7 @@ export class CampaignService {
         `[CampaignService][getCampaignByCompanyId] error when create campaign for ${campaignRequest}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 
@@ -114,11 +144,7 @@ export class CampaignService {
         `[CampaignService][updateCampaignById] error when update campaign by id: ${campaignId}`,
         error,
       );
-      return this.response.errorResponse(
-        error.response?.statusCode ?? 500,
-        error?.message ?? 'internal server error',
-        error.response ? error.response : error.detail,
-      );
+      return this.response.error(error);
     }
   }
 }

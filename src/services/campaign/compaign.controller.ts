@@ -7,6 +7,22 @@ import { CampaignRequest } from './dto/campaign.dto';
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
+  @Get('/all')
+  async getAllCampaign(): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CampaignController][getAllCampaign] start get all campaign`,
+      );
+
+      return await this.campaignService.getAllCampaign();
+    } catch (error) {
+      console.error(
+        `[CampaignController][getAllCampaign] error when get all campaign`,
+        error,
+      );
+    }
+  }
+
   @Get('/:companyId')
   async getCampaignByCompanyId(
     @Param('companyId') companyId: string,
@@ -20,22 +36,6 @@ export class CampaignController {
     } catch (error) {
       console.error(
         `[CampaignController][getCampaignByCompanyId] error when get campaign by company id for ${companyId}`,
-        error,
-      );
-    }
-  }
-
-  @Get('/all')
-  async getAllCampaign(): Promise<GlobalResponse> {
-    try {
-      console.log(
-        `[CampaignController][getAllCampaign] start get all campaign`,
-      );
-
-      return await this.campaignService.getAllCampaign();
-    } catch (error) {
-      console.error(
-        `[CampaignController][getAllCampaign] error when get all campaign`,
         error,
       );
     }
@@ -56,6 +56,24 @@ export class CampaignController {
     } catch (error) {
       console.error(
         `[CampaignController][createNewCampaign] error when create new campaign`,
+        error,
+      );
+    }
+  }
+
+  @Post('/:id/activate')
+  async activateCampaignById(
+    @Param('id') campaignId: string,
+  ): Promise<GlobalResponse> {
+    try {
+      console.log(
+        `[CampaignController][activateCampaignById] start activate campaing by id`,
+      );
+
+      return this.campaignService.activateCampaignById(campaignId);
+    } catch (error) {
+      console.error(
+        `[CampaignController][activateCampaignById] error when activate campaign by id for ${campaignId}`,
         error,
       );
     }

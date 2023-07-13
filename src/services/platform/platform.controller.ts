@@ -1,13 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { GlobalResponseType } from 'src/helper/types/common.type';
-import { PlatformRequest } from './dto/platform.dto';
+import { Platform } from './dto/platform.dto';
 import { PlatformService } from './platform.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('v1/platform')
 export class PlatformController {
   constructor(private readonly platformService: PlatformService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Get('/all')
+  @HttpCode(HttpStatus.OK)
   async getAllPlatform(): Promise<GlobalResponseType> {
     try {
       console.log(`[PlatformController][PlatformService] get all platform`);
@@ -20,9 +33,11 @@ export class PlatformController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async createPlatform(
-    @Body() platform: PlatformRequest,
+    @Body() platform: Platform,
   ): Promise<GlobalResponseType> {
     try {
       console.log(
@@ -37,7 +52,9 @@ export class PlatformController {
     }
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Delete('/:platformId')
+  @HttpCode(HttpStatus.OK)
   async deletePlatfromById(
     @Param('platformId') platformId: string,
   ): Promise<GlobalResponseType> {

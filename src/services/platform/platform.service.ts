@@ -3,17 +3,22 @@ import { GlobalResponse } from 'src/helper/common/globalResponse';
 import { GlobalResponseType } from 'src/helper/types/common.type';
 import { PlatformEntity } from './database/entity/platform.entity';
 import { PlatformRepository } from './database/platform.repository';
+import { Platform } from './dto/platform.dto';
+import { PlatformAdapter } from './adapter/platform.adapter';
 
 @Injectable()
 export class PlatformService {
   response = new GlobalResponse();
-  constructor(private readonly platformRespository: PlatformRepository) {}
+  constructor(
+    private readonly platformRespository: PlatformRepository,
+    private readonly platformAdapter: PlatformAdapter,
+  ) {}
 
   async createPlatform(platform: string): Promise<GlobalResponseType> {
     try {
       const newPlatfrom: PlatformEntity = new PlatformEntity();
       newPlatfrom.id = crypto.randomUUID();
-      newPlatfrom.platformName = platform;
+      newPlatfrom.platformName = platform.toUpperCase();
       await this.platformRespository.save(newPlatfrom).catch((error) => {
         throw error.detail;
       });
@@ -75,6 +80,26 @@ export class PlatformService {
     } catch (error) {
       console.error(
         `[PlatformService][getAllPlatform] error when get all platform`,
+        error,
+      );
+      return this.response.error(error);
+    }
+  }
+
+  async getPlatformById(platformId: string): Promise<Platform> {
+    try {
+      const platform: PlatformEntity = await this.platformRespository.findOneBy(
+        {
+          id: platformId,
+        },
+      );
+      const platformAdapter: Platform =
+        this.platformAdapter.entityToReponse(platform);
+
+      return platformAdapter;
+    } catch (error) {
+      console.error(
+        `[PlatformService][getPlatformById] error when get platform id ${platformId}`,
         error,
       );
       return this.response.error(error);

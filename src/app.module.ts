@@ -11,6 +11,8 @@ import { PlatformModule } from './services/platform/platform.module';
 import { CompanyModule } from './services/company/company.module';
 import { CampaignModule } from './services/campaign/campaign.module';
 import { AdsContainerModule } from './services/ads_container/adsContainer.module';
+import { AdsDataModule } from './services/ads_data/adsData.module';
+import { YoutubeAdsModule } from './services/youtube/youtube.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { AdsContainerModule } from './services/ads_container/adsContainer.module
     CompanyModule,
     CampaignModule,
     AdsContainerModule,
+    AdsDataModule,
+    YoutubeAdsModule,
   ],
   controllers: [],
   providers: [DbConfigService],

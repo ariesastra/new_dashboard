@@ -9,6 +9,7 @@ export class AdsContainerEntityAdapter {
     response.campaignId = adsContainerEntity.campaignId;
     response.platformId = adsContainerEntity.platformId;
     response.adsName = adsContainerEntity.adsName;
+    response.sheetId = adsContainerEntity.sheetId;
 
     return response;
   }
