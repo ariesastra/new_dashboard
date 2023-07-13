@@ -21,7 +21,7 @@ export class YoutubeDataAdapter {
     return adsData;
   }
 
-  public otherYoutube(sheetData: string[], range: string) {
+  public otherYoutube(sheetData: any[], range: string) {
     const adsData: AdsData = new AdsData();
 
     if (range === SHEET_RANGE.DEVICE) adsData.device = sheetData[1];
