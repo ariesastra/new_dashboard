@@ -234,11 +234,11 @@ export class AdsDataService {
       for (const locationData of restOfLocationData) {
         const adsData: AdsData = await this.youtubeAdapter.youtubeDataAdapter(
           locationData,
-          SHEET_RANGE.LOCATION,
+          SHEET_RANGE.REGION,
         );
         adsDataEntity.date = locationData[0];
         adsDataEntity.adsRange =
-          SHEET_RANGE.LOCATION + '.' + locationData[1].replace(/ /g, '_');
+          SHEET_RANGE.REGION + '.' + locationData[1].replace(/ /g, '_');
         adsDataEntity.adsData = adsData;
 
         await this.adsDataRepository
@@ -247,13 +247,13 @@ export class AdsDataService {
       }
     } catch (error) {
       console.error(
-        `[AdsDataService][ageDateAssignment] error when create new ${SHEET_RANGE.LOCATION} ads data for ${adsContainer.adsName}`,
+        `[AdsDataService][ageDateAssignment] error when create new ${SHEET_RANGE.REGION} ads data for ${adsContainer.adsName}`,
         error,
       );
       throw error;
     } finally {
       console.log(
-        `[AdsDataService][ageDateAssignment] success save data ${SHEET_RANGE.LOCATION} for ${adsContainer.adsName}`,
+        `[AdsDataService][ageDateAssignment] success save data ${SHEET_RANGE.REGION} for ${adsContainer.adsName}`,
       );
     }
   }
