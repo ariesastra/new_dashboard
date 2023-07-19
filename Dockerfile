@@ -1,5 +1,8 @@
 # Base Image
-FROM node:18
+FROM node:18-alpine
+
+# Using ENV for Production
+ENV NODE_ENV production
 
 # Create App Directory
 WORKDIR /usr/src/app
