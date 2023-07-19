@@ -1,8 +1,8 @@
-FROM alpine:3.18 as build
-
+FROM alpine:3.18
 ENV NODE_VERSION 20.4.0
+RUN apk add --update nodejs npm yarn
 
-WORKDIR /app
+WORKDIR /usr/src/app
 COPY package*.json yarn.lock ./
 
 RUN yarn install
