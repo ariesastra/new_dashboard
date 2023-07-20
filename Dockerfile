@@ -1,23 +1,21 @@
 # Base Image
 FROM node:18-alpine
 
-# Using ENV for Production
-ENV NODE_ENV production
+RUN apk add --update nodejs npm yarn
 
 # Create App Directory
 WORKDIR /usr/src/app
-
 # A wildcard to ensure all dependencies are copied
 COPY package*.json yarn.lock ./
 
-# Install All Dependencies
-RUN yarn
-
-# Bundle App Resource
+RUN yarn install
 COPY . .
-
-# Create Production Build
 RUN yarn build
 
-# Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+EXPOSE 8000
+
+ARG ENV_ARG
+ENV NODE_ENV=$ENV_ARG
+RUN echo $NODE_ENV
+
+CMD [ "node", "dist/main" ]
