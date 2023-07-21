@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { HelathController } from './health.controller';
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [HelathController],
 })
 export class HealthModule {}
