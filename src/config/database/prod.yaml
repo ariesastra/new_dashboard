@@ -3,5 +3,5 @@ database:
   port: 5432
   username: "postgres"
   password: "mydashboardads"
-  database: "dashboard-ads"
+  database: "postgres"
   schema: "main"
