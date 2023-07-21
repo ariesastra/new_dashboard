@@ -13,6 +13,7 @@ import { CampaignModule } from './services/campaign/campaign.module';
 import { AdsContainerModule } from './services/ads_container/adsContainer.module';
 import { AdsDataModule } from './services/ads_data/adsData.module';
 import { YoutubeAdsModule } from './services/youtube/youtube.module';
+import { HealthModule } from './services/health/health.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { YoutubeAdsModule } from './services/youtube/youtube.module';
     AdsContainerModule,
     AdsDataModule,
     YoutubeAdsModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [DbConfigService],
